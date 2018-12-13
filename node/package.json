@@ -1,0 +1,21 @@
+{
+  "name": "vtex.pixel-manager-server",
+  "version": "0.0.0",
+  "private": true,
+  "dependencies": {
+  },
+  "devDependencies": {
+    "@types/koa": "^2.0.39",
+    "@types/koa-compose": "^3.2.2",
+    "@types/node": "^7.0.8",
+    "@types/ramda": "types/npm-ramda#dist",
+    "prettier": "1.7.4",
+    "tslint": "^5.8.0",
+    "tslint-config-vtex": "^2.0.0",
+    "typescript": "^2.8.1"
+  },
+  "scripts": {
+    "lint": "tsc --noEmit --pretty && tslint -c tslint.json './**/*.ts'"
+  },
+  "license": "UNLICENSED"
+}
