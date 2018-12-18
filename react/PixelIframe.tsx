@@ -1,16 +1,12 @@
 import PropTypes from 'prop-types'
 import React, { Component } from 'react'
-import { withRuntimeContext } from 'render'
+import { withRuntimeContext, RuntimeContext } from 'render'
 
 import { ContextType, Pixel, PixelData, Subscriber } from './PixelContext'
 
 interface Props {
   pixel: string
-  runtime: {
-    culture: {
-      currency: string
-    }
-  }
+  runtime: RuntimeContext
 }
 
 class PixelIframe extends Component<Props & ContextType> {
