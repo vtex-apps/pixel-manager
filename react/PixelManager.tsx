@@ -1,28 +1,25 @@
-import PropTypes from 'prop-types'
 import React, { Fragment } from 'react'
-import { withRuntimeContext, RuntimeContext } from 'render'
+import { DataProps, graphql } from 'react-apollo'
 
 import PixelIframe from './PixelIframe'
+import installedPixelsQuery from './queries/installedPixelsQuery.gql'
 
-interface Props {
-  runtime: RuntimeContext
+interface Response {
+  installedPixels: string[]
 }
 
-const PixelManager: React.SFC<Props> = ({ runtime: { extensions } }) => {
-  const pixels = Object.entries(extensions)
-    .filter(([extensionName]) => extensionName.startsWith('store/pixel/'))
-    .map(([_, ext]) => ext.declarer)
+type Props = DataProps<Response>
+
+const PixelManager: React.SFC<Props> = ({ data: { loading, installedPixels } }) => {
+  if (loading || !installedPixels) {
+    return null
+  }
 
   return (
     <Fragment>
-      {pixels.map(pixel => (
-        <PixelIframe
-          key={pixel}
-          pixel={pixel}
-        />
-      ))}
+      {installedPixels.map(pixel => <PixelIframe key={pixel} pixel={pixel} />)}
     </Fragment>
   )
 }
 
-export default withRuntimeContext(PixelManager)
+export default graphql<Props>(installedPixelsQuery)(PixelManager)

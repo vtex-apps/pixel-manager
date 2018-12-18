@@ -1,6 +1,5 @@
 import hoistNonReactStatics from 'hoist-non-react-statics'
 import React, { Component } from 'react'
-import { withRuntimeContext } from 'render'
 import { Subtract } from 'utility-types'
 
 const SUBSCRIPTION_TIMEOUT = 100
@@ -47,7 +46,7 @@ const getDisplayName = (comp: React.ComponentType<any>) => comp.displayName || c
  * Wrapped Component. This component will be used by the installed apps.
  */
 export function Pixel<T extends ContextType>(WrappedComponent: React.ComponentType<T>) {
-  const PixelComponent: React.StatelessComponent<Subtract<T, ContextType>> = props => (
+  const PixelComponent: React.SFC<Subtract<T, ContextType>> = props => (
     <PixelContext.Consumer>
       {({ subscribe, push }) =>
         <WrappedComponent
@@ -72,7 +71,7 @@ interface ProviderState {
  * HOC Component that has the Pixel logic, dispatching store events
  * to the subscribed external components.
  */
-export class PixelProvider extends Component<{}, ProviderState> {
+class PixelProvider extends Component<{}, ProviderState> {
   public state = {
     subscribers: [],
   }
@@ -82,7 +81,7 @@ export class PixelProvider extends Component<{}, ProviderState> {
    * defined for the corresponding data
    */
   public notifySubscribers = (data: PixelData) => {
-    this.state.subscribers.forEach(subscriber => {
+    this.state.subscribers.forEach((subscriber: Subscriber) => {
       if (data.event && subscriber[data.event]) {
         const eventHandler = subscriber[data.event] as PixelEventHandler
         eventHandler(data)
@@ -141,4 +140,4 @@ export class PixelProvider extends Component<{}, ProviderState> {
   }
 }
 
-export default { Pixel }
+export default { Pixel, PixelProvider }

@@ -1,6 +1,5 @@
-import PropTypes from 'prop-types'
 import React, { Component } from 'react'
-import { withRuntimeContext, RuntimeContext } from 'render'
+import { RuntimeContext, withRuntimeContext } from 'render'
 
 import { ContextType, Pixel, PixelData, Subscriber } from './PixelContext'
 
