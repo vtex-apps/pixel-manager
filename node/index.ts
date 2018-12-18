@@ -1,6 +1,7 @@
 import { map } from 'ramda'
 
 import pixelFrame from './handlers/pixelFrame'
+import { resolvers } from './resolvers'
 import Resources from './resources'
 
 const prepare = (handler: (ctx: StoreContext) => Promise<void>) => async (ctx: StoreContext) => {
@@ -31,6 +32,9 @@ const prepare = (handler: (ctx: StoreContext) => Promise<void>) => async (ctx: S
 }
 
 export default {
+  graphql: {
+    resolvers,
+  },
   routes: map(prepare, {
     pixelFrame,
   })

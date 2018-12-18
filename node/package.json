@@ -5,13 +5,13 @@
   "dependencies": {
     "@vtex/api": "^1.5.1",
     "koa-compose": "^4.0.0",
-    "ramda": "^0.25.0"
+    "ramda": "^0.26.1"
   },
   "devDependencies": {
     "@types/koa": "^2.0.39",
     "@types/koa-compose": "^3.2.2",
     "@types/node": "^7.0.8",
-    "@types/ramda": "types/npm-ramda#dist",
+    "@types/ramda": "^0.25.44",
     "prettier": "1.7.4",
     "tslint": "^5.8.0",
     "tslint-config-vtex": "^2.0.0",

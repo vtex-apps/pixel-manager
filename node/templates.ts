@@ -11,4 +11,3 @@ export const ok = ({ settings = {}, scripts }: TemplateInput) => `<!DOCTYPE html
   </script>
 </head>
 </html>`
-
