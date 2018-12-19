@@ -1,4 +1,6 @@
-import {Apps, LRUCache} from '@vtex/api'
+import { Apps, LRUCache } from '@vtex/api'
+
+import { getAppMajor } from '../utils/conf'
 
 const RESPONSE_CACHE_TTL_MS = 60 * 60 * 1000
 const LONG_TIMEOUT = 20 * 1000
@@ -20,7 +22,7 @@ export const queries = {
 
     const apps = new Apps(vtex, withLongTimeout)
 
-    const deps = await apps.getDependencies('vtex.pixel-manager@0.x')
+    const deps = await apps.getDependencies(`vtex.pixel-manager@${getAppMajor()}.x`)
 
     return Object.keys(deps).filter(appId => APP_WHITELIST.indexOf(appId.split('@')[0]) === -1)
   },
