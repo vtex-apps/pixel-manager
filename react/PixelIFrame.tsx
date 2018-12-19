@@ -8,7 +8,7 @@ interface Props {
   runtime: RuntimeContext
 }
 
-class PixelIframe extends Component<Props & ContextType> {
+class PixelIFrame extends Component<Props & ContextType> {
   private frame: React.RefObject<HTMLIFrameElement> = React.createRef()
   private unsubscribe?: () => void
 
@@ -69,4 +69,4 @@ class PixelIframe extends Component<Props & ContextType> {
   }
 }
 
-export default Pixel(withRuntimeContext(PixelIframe))
+export default Pixel(withRuntimeContext(PixelIFrame))
