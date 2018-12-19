@@ -90,7 +90,7 @@ class PixelProvider extends Component<{}, ProviderState> {
   }
 
   /**
-   * Notify all subscribers of a event data
+   * Notify all subscribers of an event data
    */
   public push = (data: PixelData) => {
     const notifyAndPush = () => {
