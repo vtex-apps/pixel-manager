@@ -1,10 +1,12 @@
 {
   "compilerOptions": {
     "types": [
-      "node"
+      "node",
+      "jest"
     ],
     "allowJs": true,
     "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
     "jsx": "react",
     "lib": ["es2017", "dom"],
     "module": "es6",

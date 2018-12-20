@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
+    "test": "jest",
     "lint": "tsc --noEmit --pretty && tslint -c tslint.json './**/*.ts'"
   },
   "dependencies": {
@@ -14,10 +15,25 @@
     "utility-types": "^2.1.0"
   },
   "devDependencies": {
+    "@types/enzyme": "^3.1.15",
+    "@types/enzyme-adapter-react-16": "^1.0.3",
     "@types/hoist-non-react-statics": "^3.0.1",
+    "@types/jest": "^23.3.10",
+    "@types/jsdom": "^12.2.0",
     "@types/prop-types": "^15.5.8",
     "@types/react": "^16.7.17",
+    "babel-jest": "^23.6.0",
+    "enzyme": "^3.8.0",
+    "enzyme-adapter-react-16": "^1.7.1",
+    "enzyme-to-json": "^3.3.5",
+    "graphql-tag": "^2.10.0",
+    "jest": "^23.6.0",
+    "jest-transform-graphql": "^2.1.0",
+    "jsdom": "^13.1.0",
     "prettier": "^1.15.3",
+    "react": "^16.7.0",
+    "react-dom": "^16.7.0",
+    "ts-jest": "^23.10.5",
     "tslint": "^5.11.0",
     "tslint-config-vtex": "^2.1.0",
     "typescript": "^2.9.2"
