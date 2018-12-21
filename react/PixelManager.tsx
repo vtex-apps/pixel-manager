@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react'
-import { ChildDataProps, DataProps, graphql } from 'react-apollo'
+import { DataProps, graphql } from 'react-apollo'
 
 import PixelIFrame from './PixelIFrame'
 import installedPixelsQuery from './queries/installedPixelsQuery.gql'
@@ -10,7 +10,7 @@ interface Data {
 
 const withInstalledPixels = graphql<{}, Data>(installedPixelsQuery)
 
-const PixelManager = withInstalledPixels(({ data }) => {
+const PixelManager: React.SFC<Partial<DataProps<Data, {}>>> = ({ data }) => {
   if (!data || data.loading || !data.installedPixels) {
     return null
   }
@@ -20,6 +20,6 @@ const PixelManager = withInstalledPixels(({ data }) => {
       {data.installedPixels.map(pixel => <PixelIFrame key={pixel} pixel={pixel} />)}
     </Fragment>
   )
-})
+}
 
-export default PixelManager
+export default withInstalledPixels(PixelManager)
