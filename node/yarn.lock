@@ -115,10 +115,9 @@
   resolved "https://registry.yarnpkg.com/@types/ramda/-/ramda-0.25.41.tgz#c965160129d7e8345e40508858514f8ec7af706f"
   integrity sha512-R6IkySFkrCN6Xd3exKX1PI2hvkmpbDZBKYz7u4uuYas8NeUCmcHkccYo6OWKtWIkYipjGBQP2ZzlTT+R3bUY6Q==
 
-"@types/ramda@^0.25.44":
-  version "0.25.44"
-  resolved "https://registry.yarnpkg.com/@types/ramda/-/ramda-0.25.44.tgz#3e442ed487844a4fc33efed357d514940ef1b7fe"
-  integrity sha512-LaaBuiDSTo4FlsgNMpKoIgnbq85PP/blpptQgNijtR/H5iXhtBtByCLUElIEuSVxyno1h0yfHYqDooa+C1spIg==
+"@types/ramda@types/npm-ramda#dist":
+  version "0.25.0"
+  resolved "https://codeload.github.com/types/npm-ramda/tar.gz/9529aa3c8ff70ff84afcbc0be83443c00f30ea90"
 
 "@types/range-parser@*":
   version "1.2.2"
