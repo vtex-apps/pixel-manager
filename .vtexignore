@@ -13,4 +13,4 @@ service/node_modules/
 react/__tests__/**
 react/.babelrc
 react/.eslintrc
-react/setupTests.js
+react/setupTests.ts
