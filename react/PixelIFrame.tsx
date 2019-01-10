@@ -8,9 +8,18 @@ interface Props {
   runtime: RuntimeContext
 }
 
-class PixelIFrame extends Component<Props & ContextType> {
+interface State {
+  eventQueue: PixelData[]
+}
+
+class PixelIFrame extends Component<Props & ContextType, State> {
+  public state = {
+    eventQueue: [],
+  }
+
   private frame: React.RefObject<HTMLIFrameElement> = React.createRef()
   private unsubscribe?: () => void
+  private sendingEvents = false
 
   public pixelEventHandler = (event: string) => (data: PixelData) => {
     if (this.frame.current === null || this.frame.current.contentWindow === null) {
@@ -21,14 +30,50 @@ class PixelIFrame extends Component<Props & ContextType> {
 
     const eventName = `vtex:${event}`
 
-    this.frame.current.contentWindow.postMessage(
-      {
-        currency,
-        eventName,
-        ...data,
-      },
-      '*'
+    const eventData = {
+      currency,
+      eventName,
+      ...data,
+    }
+
+    if (navigator.onLine) {
+      if (this.state.eventQueue.length > 0) {
+        this.sendQueuedEvents()
+      }
+
+      this.sendEvent(this.frame.current.contentWindow, eventData)
+    } else {
+      this.setState(state => ({
+        eventQueue: [
+          ...state.eventQueue,
+          eventData,
+        ],
+      }))
+    }
+  }
+
+  public sendQueuedEvents = () => {
+    if (this.sendingEvents) {
+      return
+    }
+
+    this.sendingEvents = true
+
+    this.state.eventQueue.forEach(
+      queuedEvent => this.sendEvent(this.frame.current!.contentWindow!, queuedEvent)
     )
+
+    this.setState({
+      eventQueue: [],
+    }, () => this.sendingEvents = false)
+  }
+
+  public handleOnlineStatus = () => {
+    if (!this.state.eventQueue.length) {
+      return
+    }
+
+    this.sendQueuedEvents()
   }
 
   /* tslint:disable member-ordering */
@@ -43,9 +88,13 @@ class PixelIFrame extends Component<Props & ContextType> {
 
   public componentDidMount() {
     this.unsubscribe = this.props.subscribe(this)
+
+    window.addEventListener('online', this.handleOnlineStatus)
   }
 
   public componentWillUnmount() {
+    window.removeEventListener('online', this.handleOnlineStatus)
+
     if (!this.unsubscribe) {
       return
     }
@@ -66,6 +115,10 @@ class PixelIFrame extends Component<Props & ContextType> {
         ref={this.frame}
       />
     )
+  }
+
+  private sendEvent = (frameWindow: Window, data: PixelData) => {
+    frameWindow.postMessage(data, '*')
   }
 }
 
