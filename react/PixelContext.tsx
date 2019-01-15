@@ -79,7 +79,9 @@ class PixelProvider extends Component<{}, ProviderState> {
   private sendingEvents = false
 
   public handleOnlineStatus() {
-    if (!window.__pixelQueue.length) {
+    const pixelQueue: PixelData[] = JSON.parse(localStorage.pixelQueue) || []
+
+    if (!pixelQueue.length) {
       return
     }
 
@@ -87,8 +89,6 @@ class PixelProvider extends Component<{}, ProviderState> {
   }
 
   public componentDidMount() {
-    window.__pixelQueue = window.__pixelQueue || []
-
     window.addEventListener('online', this.handleOnlineStatus)
   }
 
@@ -101,16 +101,13 @@ class PixelProvider extends Component<{}, ProviderState> {
    * defined for the corresponding data
    */
   public notifySubscribers = (data: PixelData) => {
-    if (!navigator.onLine) {
-      window.__pixelQueue.push(data)
-      return
-    }
-
     this.state.subscribers.forEach((subscriber: Subscriber) => {
-      if (data.event && subscriber[data.event]) {
-        const eventHandler = subscriber[data.event] as PixelEventHandler
-        eventHandler(data)
+      if (!data.event || !subscriber[data.event]) {
+        return
       }
+
+      const eventHandler = subscriber[data.event] as PixelEventHandler
+      eventHandler(data)
     })
   }
 
@@ -119,7 +116,15 @@ class PixelProvider extends Component<{}, ProviderState> {
    */
   public push = (data: PixelData) => {
     const notify = () => {
-      this.notifySubscribers(data)
+      if (!navigator.onLine) {
+        const pixelQueue: PixelData[] = JSON.parse(localStorage.pixelQueue) || []
+
+        pixelQueue.push(data)
+
+        localStorage.pixelQueue = JSON.stringify(pixelQueue)
+      } else {
+        this.notifySubscribers(data)
+      }
     }
 
     if (this.state.subscribers.length === 0) {
@@ -168,11 +173,13 @@ class PixelProvider extends Component<{}, ProviderState> {
 
     this.sendingEvents = true
 
-    window.__pixelQueue.forEach(
+    const pixelQueue: PixelData[] = JSON.parse(localStorage.pixelQueue) || []
+
+    pixelQueue.forEach(
       queuedEvent => this.notifySubscribers(queuedEvent)
     )
 
-    window.__pixelQueue = []
+    localStorage.pixelQueue = JSON.stringify([])
 
     this.sendingEvents = false
   }
