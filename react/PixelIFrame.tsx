@@ -11,7 +11,6 @@ interface Props {
 class PixelIFrame extends Component<Props & ContextType> {
   private frame: React.RefObject<HTMLIFrameElement> = React.createRef()
   private unsubscribe?: () => void
-  private sendingEvents = false
 
   private pixelEventHandler = (event: string) => (data: PixelData) => {
     if (this.frame.current === null || this.frame.current.contentWindow === null) {
