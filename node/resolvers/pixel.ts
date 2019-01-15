@@ -12,7 +12,6 @@ const cacheStorage = new LRUCache<string, any>({
 
 const APP_WHITELIST = [
   'vtex.store',
-  'vtex.request-capture-app',
 ]
 
 export const queries = {
