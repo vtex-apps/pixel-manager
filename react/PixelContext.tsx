@@ -76,11 +76,36 @@ class PixelProvider extends Component<{}, ProviderState> {
     subscribers: [],
   }
 
+  private sendingEvents = false
+
+  public handleOnlineStatus() {
+    if (!window.__pixelQueue.length) {
+      return
+    }
+
+    this.sendQueuedEvents()
+  }
+
+  public componentDidMount() {
+    window.__pixelQueue = window.__pixelQueue || []
+
+    window.addEventListener('online', this.handleOnlineStatus)
+  }
+
+  public componentWillUnmount() {
+    window.addEventListener('online', this.handleOnlineStatus)
+  }
+
   /**
    * Notify all subscribers that have a valid event handler
    * defined for the corresponding data
    */
   public notifySubscribers = (data: PixelData) => {
+    if (!navigator.onLine) {
+      window.__pixelQueue.push(data)
+      return
+    }
+
     this.state.subscribers.forEach((subscriber: Subscriber) => {
       if (data.event && subscriber[data.event]) {
         const eventHandler = subscriber[data.event] as PixelEventHandler
@@ -93,17 +118,14 @@ class PixelProvider extends Component<{}, ProviderState> {
    * Notify all subscribers of an event data
    */
   public push = (data: PixelData) => {
-    const notifyAndPush = () => {
+    const notify = () => {
       this.notifySubscribers(data)
-      if (window.dataLayer) {
-        window.dataLayer.push(data)
-      }
     }
 
     if (this.state.subscribers.length === 0) {
-      setTimeout(notifyAndPush, SUBSCRIPTION_TIMEOUT)
+      setTimeout(notify, SUBSCRIPTION_TIMEOUT)
     } else {
-      notifyAndPush()
+      notify()
     }
   }
 
@@ -137,6 +159,22 @@ class PixelProvider extends Component<{}, ProviderState> {
         {this.props.children}
       </PixelContext.Provider>
     )
+  }
+
+  private sendQueuedEvents() {
+    if (this.sendingEvents) {
+      return
+    }
+
+    this.sendingEvents = true
+
+    window.__pixelQueue.forEach(
+      queuedEvent => this.notifySubscribers(queuedEvent)
+    )
+
+    window.__pixelQueue = []
+
+    this.sendingEvents = false
   }
 }
 

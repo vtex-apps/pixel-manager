@@ -1,3 +1,3 @@
 interface Window extends Window {
-  dataLayer: any[]
+  __pixelQueue: PixelData[]
 }
