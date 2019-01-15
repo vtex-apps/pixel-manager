@@ -116,7 +116,7 @@ class PixelProvider extends Component<{}, ProviderState> {
    */
   public push = (data: PixelData) => {
     const notify = () => {
-      if (!navigator.onLine) {
+      if (typeof navigator !== 'undefined' && !navigator.onLine) {
         const pixelQueue: PixelData[] = JSON.parse(localStorage.pixelQueue) || []
 
         pixelQueue.push(data)
