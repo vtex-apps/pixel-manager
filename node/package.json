@@ -4,7 +4,6 @@
   "private": true,
   "dependencies": {
     "@vtex/api": "^1.5.1",
-    "koa-compose": "^4.0.0",
     "ramda": "^0.26.1"
   },
   "devDependencies": {
