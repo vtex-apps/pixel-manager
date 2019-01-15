@@ -24,6 +24,6 @@ export const queries = {
 
     const deps = await apps.getDependencies(`vtex.pixel-manager@${getAppMajor()}.x`)
 
-    return Object.keys(deps).filter(appId => APP_WHITELIST.indexOf(appId.split('@')[0]) === -1)
+    return Object.keys(deps).filter(appId => !APP_WHITELIST.includes(appId.split('@')[0]))
   },
 }
