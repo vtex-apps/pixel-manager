@@ -1,6 +1,5 @@
 import hoistNonReactStatics from 'hoist-non-react-statics'
 import React, { Component } from 'react'
-import { Subtract } from 'utility-types'
 
 const SUBSCRIPTION_TIMEOUT = 100
 
@@ -45,8 +44,8 @@ const getDisplayName = (comp: React.ComponentType<any>) => comp.displayName || c
  * Pixel is the HOC Component that provides an event subscription to the
  * Wrapped Component. This component will be used by the installed apps.
  */
-export function Pixel<T extends ContextType>(WrappedComponent: React.ComponentType<T>) {
-  const PixelComponent: React.SFC<Subtract<T, ContextType>> = props => (
+export function Pixel<T>(WrappedComponent: React.ComponentType<T & ContextType>) {
+  const PixelComponent: React.SFC<T> = props => (
     <PixelContext.Consumer>
       {({ subscribe, push }) =>
         <WrappedComponent
