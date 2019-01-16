@@ -20,7 +20,5 @@
   "categories": [],
   "scripts": {
     "postreleasy": "vtex publish --verbose"
-  },
-  "dependencies": {
   }
 }
