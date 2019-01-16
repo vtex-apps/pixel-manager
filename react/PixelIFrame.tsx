@@ -8,6 +8,12 @@ interface Props {
   runtime: RuntimeContext
 }
 
+// internal: the apps bellow need special
+// access and are trusted.
+const WHITELIST = [
+  'vtex.request-capture-app',
+]
+
 class PixelIFrame extends Component<Props & ContextType> {
   private frame: React.RefObject<HTMLIFrameElement> = React.createRef()
   private unsubscribe?: () => void
@@ -56,11 +62,14 @@ class PixelIFrame extends Component<Props & ContextType> {
   }
 
   public render() {
+    const { pixel } = this.props
+    const [appName] = pixel.split('@')
+
     return (
       <iframe
         hidden
-        sandbox="allow-scripts"
-        src={`/tracking-frame/${this.props.pixel}`}
+        sandbox={WHITELIST.includes(appName) ? undefined : 'allow-scripts'}
+        src={`/tracking-frame/${pixel}`}
         ref={this.frame}
       />
     )
