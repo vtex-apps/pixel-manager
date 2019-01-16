@@ -3,7 +3,8 @@ import React, { Component } from 'react'
 
 const SUBSCRIPTION_TIMEOUT = 100
 
-type EventType = 'productView'
+type EventType = 'homeView'
+  | 'productView'
   | 'otherView'
   | 'categoryView'
   | 'departmentView'
@@ -18,14 +19,8 @@ export interface PixelData {
 
 type PixelEventHandler = (data: PixelData) => void
 
-export interface Subscriber {
-  productView?: PixelEventHandler
-  categoryView?: PixelEventHandler
-  departmentView?: PixelEventHandler
-  internalSiteSearchView?: PixelEventHandler
-  otherView?: PixelEventHandler
-  pageInfo?: PixelEventHandler
-  pageView?: PixelEventHandler
+export type Subscriber = {
+  [E in EventType]?: PixelEventHandler
 }
 
 export interface ContextType {
@@ -105,8 +100,10 @@ class PixelProvider extends Component<{}, ProviderState> {
         return
       }
 
-      const eventHandler = subscriber[data.event] as PixelEventHandler
-      eventHandler(data)
+      // don't know why I need to add the bang here
+      // since I check for `!subscriber[data.event]`
+      // above, but typescript complains without it.
+      subscriber[data.event]!(data)
     })
   }
 
