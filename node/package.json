@@ -7,6 +7,8 @@
     "ramda": "^0.26.1"
   },
   "devDependencies": {
+    "@types/bluebird": "^3.5.25",
+    "@types/bluebird-global": "^3.5.9",
     "@types/koa": "^2.0.39",
     "@types/node": "^7.0.8",
     "@types/ramda": "types/npm-ramda#dist",
