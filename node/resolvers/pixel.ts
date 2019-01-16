@@ -10,6 +10,11 @@ const cacheStorage = new LRUCache<string, any>({
   maxAge: RESPONSE_CACHE_TTL_MS,
 })
 
+// This exists because we use the apps who depend on us
+// to figure out who to add to the page inside an iframe,
+// but the apps bellow also depends on this app and we
+// don't want to package them inside an iframe too, so
+// this whitelist is used to decide who won't be.
 const APP_WHITELIST = [
   'vtex.store',
 ]
