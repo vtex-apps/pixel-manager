@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Changed
 - Added iframe sandbox whitelist.
+- Added `vtex.store-components` to pixel whitelist.
 
 ## [0.1.1] - 2019-01-19
 ### Changed

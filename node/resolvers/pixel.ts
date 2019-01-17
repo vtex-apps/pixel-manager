@@ -17,6 +17,7 @@ const cacheStorage = new LRUCache<string, any>({
 // this whitelist is used to decide who won't be.
 const APP_WHITELIST = [
   'vtex.store',
+  'vtex.store-components',
 ]
 
 export const queries = {
