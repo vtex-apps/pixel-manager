@@ -4,6 +4,14 @@
   "version": "0.1.0",
   "title": "VTEX Pixel Manager",
   "description": "The VTEX Pixel Manager App.",
+  "builders": {
+    "graphql": "1.x",
+    "node": "3.x",
+    "react": "3.x"
+  },
+  "scripts": {
+    "postreleasy": "vtex publish --verbose"
+  },
   "policies": [
     {
       "name": "read-workspace-apps"
@@ -11,14 +19,5 @@
     {
       "name": "read-public-registry-assets"
     }
-  ],
-  "builders": {
-    "graphql": "1.x",
-    "node": "3.x",
-    "react": "2.x"
-  },
-  "categories": [],
-  "scripts": {
-    "postreleasy": "vtex publish --verbose"
-  }
+  ]
 }
