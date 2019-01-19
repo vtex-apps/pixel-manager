@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
-import { RuntimeContext, withRuntimeContext } from 'render'
+import { RuntimeContext, withRuntimeContext } from 'vtex.render-runtime'
 
-import { ContextType, Pixel, PixelData, Subscriber } from './PixelContext'
+import { ContextType, Pixel, PixelData } from './PixelContext'
 
 interface Props {
   pixel: string

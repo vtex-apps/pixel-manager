@@ -1,4 +1,4 @@
-declare module "render" {
+declare module "vtex.render-runtime" {
   import React from 'react'
   import { Subtract } from 'utility-types'
 
