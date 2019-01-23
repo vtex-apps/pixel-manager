@@ -8,6 +8,12 @@ interface Props {
   runtime: RuntimeContext
 }
 
+// internal: the apps bellow need special
+// access and are trusted.
+const WHITELIST = [
+  'vtex.request-capture-app',
+]
+
 class PixelIFrame extends Component<Props & ContextType> {
   private frame: React.RefObject<HTMLIFrameElement> = React.createRef()
   private unsubscribe?: () => void
@@ -31,6 +37,7 @@ class PixelIFrame extends Component<Props & ContextType> {
   }
 
   /* tslint:disable member-ordering */
+  public homeView = this.pixelEventHandler('homeView')
   public productView = this.pixelEventHandler('productView')
   public categoryView = this.pixelEventHandler('categoryView')
   public departmentView = this.pixelEventHandler('departmentView')
@@ -38,6 +45,8 @@ class PixelIFrame extends Component<Props & ContextType> {
   public otherView = this.pixelEventHandler('otherView')
   public pageInfo = this.pixelEventHandler('pageInfo')
   public pageView = this.pixelEventHandler('pageView')
+  public addToCart = this.pixelEventHandler('addToCart')
+  public removeFromCart = this.pixelEventHandler('removeFromCart')
 
   public componentDidMount() {
     this.unsubscribe = this.props.subscribe(this)
@@ -56,11 +65,14 @@ class PixelIFrame extends Component<Props & ContextType> {
   }
 
   public render() {
+    const { pixel } = this.props
+    const [appName] = pixel.split('@')
+
     return (
       <iframe
         hidden
-        sandbox="allow-scripts"
-        src={`/tracking-frame/${this.props.pixel}`}
+        sandbox={WHITELIST.includes(appName) ? undefined : 'allow-scripts'}
+        src={`/tracking-frame/${pixel}`}
         ref={this.frame}
       />
     )

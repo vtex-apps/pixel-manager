@@ -26,6 +26,7 @@ const pixelFrame = async (ctx: StoreContext) => {
     .data
     .map(file => file.path)
     .filter(path => path.startsWith('public/react') && !path.endsWith('map'))
+    .filter(path => !/\.min\.js$/.test(path))
     .map(path => `${basePath}/${appId}/${path}`)
 
   ctx.body = ok({ scripts, settings })

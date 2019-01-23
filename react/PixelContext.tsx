@@ -11,6 +11,8 @@ type EventType = 'homeView'
   | 'internalSiteSearchView'
   | 'pageInfo'
   | 'pageView'
+  | 'addToCart'
+  | 'removeFromCart'
 
 export interface PixelData {
   event?: EventType
