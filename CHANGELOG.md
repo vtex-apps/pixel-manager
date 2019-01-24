@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.1] - 2019-01-24
+### Fixed
+- Fixes some parse errors and typos.
+
 ## [0.2.0] - 2019-01-23
 ### Changed
 - Added iframe sandbox whitelist.

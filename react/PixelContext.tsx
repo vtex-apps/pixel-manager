@@ -3,7 +3,8 @@ import React, { Component } from 'react'
 
 const SUBSCRIPTION_TIMEOUT = 100
 
-type EventType = 'homeView'
+type EventType =
+  | 'homeView'
   | 'productView'
   | 'otherView'
   | 'categoryView'
@@ -21,9 +22,7 @@ export interface PixelData {
 
 type PixelEventHandler = (data: PixelData) => void
 
-export type Subscriber = {
-  [E in EventType]?: PixelEventHandler
-}
+export type Subscriber = { [E in EventType]?: PixelEventHandler }
 
 export interface ContextType {
   subscribe: (s: Subscriber) => () => void
@@ -35,22 +34,24 @@ const PixelContext = React.createContext<ContextType>({
   subscribe: () => () => undefined,
 })
 
-const getDisplayName = (comp: React.ComponentType<any>) => comp.displayName || comp.name || 'Component'
+const getDisplayName = (comp: React.ComponentType<any>) =>
+  comp.displayName || comp.name || 'Component'
+
+const getPixelQueue = (): PixelData[] =>
+  localStorage.pixelQueue ? JSON.parse(localStorage.pixelQueue) : []
 
 /**
  * Pixel is the HOC Component that provides an event subscription to the
  * Wrapped Component. This component will be used by the installed apps.
  */
-export function Pixel<T>(WrappedComponent: React.ComponentType<T & ContextType>) {
+export function Pixel<T>(
+  WrappedComponent: React.ComponentType<T & ContextType>
+) {
   const PixelComponent: React.SFC<T> = props => (
     <PixelContext.Consumer>
-      {({ subscribe, push }) =>
-        <WrappedComponent
-          {...props}
-          push={push}
-          subscribe={subscribe}
-        />
-      }
+      {({ subscribe, push }) => (
+        <WrappedComponent {...props} push={push} subscribe={subscribe} />
+      )}
     </PixelContext.Consumer>
   )
 
@@ -60,7 +61,7 @@ export function Pixel<T>(WrappedComponent: React.ComponentType<T & ContextType>)
 }
 
 interface ProviderState {
-  subscribers: Subscriber[],
+  subscribers: Subscriber[]
 }
 
 /**
@@ -74,22 +75,12 @@ class PixelProvider extends Component<{}, ProviderState> {
 
   private sendingEvents = false
 
-  public handleOnlineStatus() {
-    const pixelQueue: PixelData[] = JSON.parse(localStorage.pixelQueue) || []
-
-    if (!pixelQueue.length) {
-      return
-    }
-
-    this.sendQueuedEvents()
-  }
-
   public componentDidMount() {
-    window.addEventListener('online', this.handleOnlineStatus)
+    window.addEventListener('online', this.sendQueuedEvents)
   }
 
   public componentWillUnmount() {
-    window.addEventListener('online', this.handleOnlineStatus)
+    window.removeEventListener('online', this.sendQueuedEvents)
   }
 
   /**
@@ -115,7 +106,7 @@ class PixelProvider extends Component<{}, ProviderState> {
   public push = (data: PixelData) => {
     const notify = () => {
       if (typeof navigator !== 'undefined' && !navigator.onLine) {
-        const pixelQueue: PixelData[] = JSON.parse(localStorage.pixelQueue) || []
+        const pixelQueue: PixelData[] = getPixelQueue()
 
         pixelQueue.push(data)
 
@@ -164,19 +155,16 @@ class PixelProvider extends Component<{}, ProviderState> {
     )
   }
 
-  private sendQueuedEvents() {
+  private sendQueuedEvents = () => {
     if (this.sendingEvents) {
       return
     }
 
     this.sendingEvents = true
 
-    const pixelQueue: PixelData[] = JSON.parse(localStorage.pixelQueue) || []
+    const pixelQueue: PixelData[] = getPixelQueue()
 
-    pixelQueue.forEach(
-      queuedEvent => this.notifySubscribers(queuedEvent)
-    )
-
+    pixelQueue.forEach(queuedEvent => this.notifySubscribers(queuedEvent))
     localStorage.pixelQueue = JSON.stringify([])
 
     this.sendingEvents = false
