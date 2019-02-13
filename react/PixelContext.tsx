@@ -1,5 +1,5 @@
 import hoistNonReactStatics from 'hoist-non-react-statics'
-import React, { Component } from 'react'
+import React, { Component, useContext, createContext } from 'react'
 
 const SUBSCRIPTION_TIMEOUT = 100
 
@@ -29,7 +29,7 @@ export interface ContextType {
   push: (data: PixelData) => void
 }
 
-const PixelContext = React.createContext<ContextType>({
+const PixelContext = createContext<ContextType>({
   push: () => undefined,
   subscribe: () => () => undefined,
 })
@@ -58,6 +58,10 @@ export function Pixel<T>(
   PixelComponent.displayName = `withPixel(${getDisplayName(WrappedComponent)})`
 
   return hoistNonReactStatics(PixelComponent, WrappedComponent)
+}
+
+export const usePixel = () => {
+  return useContext(PixelContext)
 }
 
 interface ProviderState {
