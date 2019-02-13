@@ -1,4 +1,4 @@
-declare module "vtex.render-runtime" {
+declare module 'vtex.render-runtime' {
   import React from 'react'
   import { Subtract } from 'utility-types'
 
@@ -25,4 +25,6 @@ declare module "vtex.render-runtime" {
   export function withRuntimeContext<T extends RuntimeProps>(
     comp: React.ComponentType<T>
   ): React.ComponentType<Subtract<T, RuntimeProps>>
+
+  export function useRuntime(): RuntimeContext
 }
