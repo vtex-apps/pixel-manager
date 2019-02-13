@@ -10,6 +10,7 @@
     "react": "3.x"
   },
   "scripts": {
+    "prereleasy": "bash lint.sh",
     "postreleasy": "vtex publish --verbose"
   },
   "policies": [
