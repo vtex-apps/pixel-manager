@@ -1,11 +1,10 @@
-import React, { Component } from 'react'
-import { RuntimeContext, withRuntimeContext } from 'vtex.render-runtime'
+import React, { memo, useRef, useEffect } from 'react'
+import { useRuntime } from 'vtex.render-runtime'
 
-import { ContextType, Pixel, PixelData } from './PixelContext'
+import { PixelData, usePixel } from './PixelContext'
 
 interface Props {
   pixel: string
-  runtime: RuntimeContext
 }
 
 // internal: the apps bellow need special
@@ -14,16 +13,39 @@ const WHITELIST = [
   'vtex.request-capture-app',
 ]
 
-class PixelIFrame extends Component<Props & ContextType> {
-  private frame: React.RefObject<HTMLIFrameElement> = React.createRef()
-  private unsubscribe?: () => void
+const PixelIFrame: React.FunctionComponent<Props> = ({ pixel }) => {
+  const frame: React.RefObject<HTMLIFrameElement> = useRef(null)
 
-  private pixelEventHandler = (event: string) => (data: PixelData) => {
-    if (this.frame.current === null || this.frame.current.contentWindow === null) {
+  const runtime = useRuntime()
+  const { subscribe } = usePixel()
+
+  useEffect(() => {
+    const unsubscribe = subscribe({
+      addToCart: pixelEventHandler('addToCart'),
+      categoryView: pixelEventHandler('categoryView'),
+      departmentView: pixelEventHandler('departmentView'),
+      homeView: pixelEventHandler('homeView'),
+      internalSiteSearchView: pixelEventHandler('internalSiteSearchView'),
+      otherView: pixelEventHandler('otherView'),
+      pageInfo: pixelEventHandler('pageInfo'),
+      pageView: pixelEventHandler('pageView'),
+      productView: pixelEventHandler('productView'),
+      removeFromCart: pixelEventHandler('removeFromCart'),
+    })
+
+    return () => unsubscribe()
+  }, [runtime.culture.currency, pixel])
+
+  const sendEvent = (frameWindow: Window, data: PixelData) => {
+    frameWindow.postMessage(data, '*')
+  }
+
+  const pixelEventHandler = (event: string) => (data: PixelData) => {
+    if (frame.current === null || frame.current.contentWindow === null) {
       return
     }
 
-    const { runtime: { culture: { currency } } } = this.props
+    const { culture: { currency } } = runtime
 
     const eventName = `vtex:${event}`
 
@@ -33,55 +55,22 @@ class PixelIFrame extends Component<Props & ContextType> {
       ...data,
     }
 
-    this.sendEvent(this.frame.current.contentWindow, eventData)
+    sendEvent(frame.current.contentWindow, eventData)
   }
 
-  /* tslint:disable member-ordering */
-  public homeView = this.pixelEventHandler('homeView')
-  public productView = this.pixelEventHandler('productView')
-  public categoryView = this.pixelEventHandler('categoryView')
-  public departmentView = this.pixelEventHandler('departmentView')
-  public internalSiteSearchView = this.pixelEventHandler('internalSiteSearchView')
-  public otherView = this.pixelEventHandler('otherView')
-  public pageInfo = this.pixelEventHandler('pageInfo')
-  public pageView = this.pixelEventHandler('pageView')
-  public addToCart = this.pixelEventHandler('addToCart')
-  public removeFromCart = this.pixelEventHandler('removeFromCart')
+  const [appName] = pixel.split('@')
 
-  public componentDidMount() {
-    this.unsubscribe = this.props.subscribe(this)
-  }
-
-  public componentWillUnmount() {
-    if (!this.unsubscribe) {
-      return
-    }
-
-    this.unsubscribe()
-  }
-
-  public shouldComponentUpdate(prevProps: Props) {
-    return prevProps.pixel !== this.props.pixel
-  }
-
-  public render() {
-    const { pixel } = this.props
-    const [appName] = pixel.split('@')
-
-    return (
-      <iframe
-        hidden
-        sandbox={WHITELIST.includes(appName) ? undefined : 'allow-scripts'}
-        src={`/tracking-frame/${pixel}`}
-        ref={this.frame}
-      />
-    )
-  }
-  /* tslint:enable member-ordering */
-
-  private sendEvent = (frameWindow: Window, data: PixelData) => {
-    frameWindow.postMessage(data, '*')
-  }
+  return (
+    <iframe
+      hidden
+      sandbox={WHITELIST.includes(appName) ? undefined : 'allow-scripts'}
+      src={`/tracking-frame/${pixel}`}
+      ref={frame}
+    />
+  )
 }
 
-export default Pixel(withRuntimeContext(PixelIFrame))
+const areEqual = (prevProps: Props, props: Props) =>
+  prevProps.pixel === props.pixel
+
+export default memo(PixelIFrame, areEqual)
