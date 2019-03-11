@@ -1,4 +1,4 @@
-import { nth, zip } from 'ramda'
+import { nth, zip, prop, map } from 'ramda'
 import { Apps, LRUCache } from '@vtex/api'
 
 import { getAppMajor } from '../utils/conf'
@@ -27,10 +27,8 @@ export const queries = {
 
     return Promise.all(
       zip(Object.keys(deps), manifests)
-        .filter(
-          ([_, manifest]) =>
-            manifest.policies &&
-            manifest.policies.findIndex(({ name }) => name === 'pixel') !== -1
+        .filter(([_, manifest]) =>
+          map(prop('name'), manifest.policies || []).includes('pixel')
         )
         .map(nth(0))
     )
