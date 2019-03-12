@@ -10,35 +10,18 @@ interface Props {
 // internal: the apps bellow need special
 // access and are trusted.
 const WHITELIST = [
-  'vtex.request-capture-app',
+  'vtex.request-capture',
 ]
+
+const sendEvent = (frameWindow: Window, data: PixelData) => {
+  frameWindow.postMessage(data, '*')
+}
 
 const PixelIFrame: React.FunctionComponent<Props> = ({ pixel }) => {
   const frame: React.RefObject<HTMLIFrameElement> = useRef(null)
 
   const runtime = useRuntime()
   const { subscribe } = usePixel()
-
-  useEffect(() => {
-    const unsubscribe = subscribe({
-      addToCart: pixelEventHandler('addToCart'),
-      categoryView: pixelEventHandler('categoryView'),
-      departmentView: pixelEventHandler('departmentView'),
-      homeView: pixelEventHandler('homeView'),
-      internalSiteSearchView: pixelEventHandler('internalSiteSearchView'),
-      otherView: pixelEventHandler('otherView'),
-      pageInfo: pixelEventHandler('pageInfo'),
-      pageView: pixelEventHandler('pageView'),
-      productView: pixelEventHandler('productView'),
-      removeFromCart: pixelEventHandler('removeFromCart'),
-    })
-
-    return () => unsubscribe()
-  }, [runtime.culture.currency, pixel])
-
-  const sendEvent = (frameWindow: Window, data: PixelData) => {
-    frameWindow.postMessage(data, '*')
-  }
 
   const pixelEventHandler = (event: string) => (data: PixelData) => {
     if (frame.current === null || frame.current.contentWindow === null) {
@@ -57,6 +40,23 @@ const PixelIFrame: React.FunctionComponent<Props> = ({ pixel }) => {
 
     sendEvent(frame.current.contentWindow, eventData)
   }
+
+  useEffect(() => {
+    const unsubscribe = subscribe({
+      addToCart: pixelEventHandler('addToCart'),
+      categoryView: pixelEventHandler('categoryView'),
+      departmentView: pixelEventHandler('departmentView'),
+      homeView: pixelEventHandler('homeView'),
+      internalSiteSearchView: pixelEventHandler('internalSiteSearchView'),
+      otherView: pixelEventHandler('otherView'),
+      pageInfo: pixelEventHandler('pageInfo'),
+      pageView: pixelEventHandler('pageView'),
+      productView: pixelEventHandler('productView'),
+      removeFromCart: pixelEventHandler('removeFromCart'),
+    })
+
+    return () => unsubscribe()
+  }, [runtime.culture.currency, pixel])
 
   const [appName] = pixel.split('@')
 

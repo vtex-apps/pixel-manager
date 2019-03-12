@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.1] - 2019-03-12
+### Changed
+- Renamed app `request-capture-app` to `request-capture`.
+
 ## [0.3.0] - 2019-02-13
 ### Added
 - Add `usePixel` hook.
