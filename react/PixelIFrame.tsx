@@ -11,6 +11,7 @@ interface Props {
 // access and are trusted.
 const WHITELIST = [
   'vtex.request-capture',
+  'gocommerce.google-analytics',
 ]
 
 const sendEvent = (frameWindow: Window, data: PixelData) => {
