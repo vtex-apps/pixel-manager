@@ -1,3 +1,4 @@
+import { nth, zip, prop, map } from 'ramda'
 import { Apps, LRUCache } from '@vtex/api'
 
 import { getAppMajor } from '../utils/conf'
@@ -10,25 +11,26 @@ const cacheStorage = new LRUCache<string, any>({
   maxAge: RESPONSE_CACHE_TTL_MS,
 })
 
-// This exists because we use the apps who depend on us
-// to figure out who to add to the page inside an iframe,
-// but the apps bellow also depends on this app and we
-// don't want to package them inside an iframe too, so
-// this whitelist is used to decide who won't be.
-const APP_WHITELIST = [
-  'vtex.store',
-  'vtex.store-components',
-]
-
 export const queries = {
   installedPixels: async (_, __, { vtex }) => {
-    const opts = {cacheStorage}
-    const withLongTimeout = {...opts, timeout: LONG_TIMEOUT}
+    const opts = { cacheStorage }
+    const withLongTimeout = { ...opts, timeout: LONG_TIMEOUT }
 
     const apps = new Apps(vtex, withLongTimeout)
 
-    const deps = await apps.getDependencies(`vtex.pixel-manager@${getAppMajor()}.x`)
+    const deps = await apps.getDependencies(
+      `vtex.pixel-manager@${getAppMajor()}.x`
+    )
+    const manifests = await Promise.all(
+      Object.keys(deps).map(appId => apps.getApp(appId))
+    )
 
-    return Object.keys(deps).filter(appId => !APP_WHITELIST.includes(appId.split('@')[0]))
+    return Promise.all(
+      zip(Object.keys(deps), manifests)
+        .filter(([_, manifest]) =>
+          map(prop('name'), manifest.policies || []).includes('pixel')
+        )
+        .map(nth(0))
+    )
   },
 }

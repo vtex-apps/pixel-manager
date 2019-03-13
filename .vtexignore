@@ -14,3 +14,4 @@ react/__tests__/**
 react/.babelrc
 react/.eslintrc
 react/setupTests.ts
+react/jest.config.js

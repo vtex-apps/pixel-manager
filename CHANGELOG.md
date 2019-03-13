@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] - 2019-03-13
+### Changed
+- Filter apps by `pixel` policy.
+
 ## [0.3.1] - 2019-03-12
 ### Changed
 - Renamed app `request-capture-app` to `request-capture`.
