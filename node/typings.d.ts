@@ -3,6 +3,7 @@ import { Context } from 'koa'
 import Resources from './resources'
 
 declare global {
+  // eslint-disable-next-line
   interface IOContext {
     account: string
     workspace: string

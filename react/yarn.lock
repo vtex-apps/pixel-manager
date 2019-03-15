@@ -4795,6 +4795,10 @@ verror@1.10.0:
     core-util-is "1.0.2"
     extsprintf "^1.2.0"
 
+"vtex.render-runtime@https://lucas--storecomponents.myvtex.com/_v/public/typings/v1/vtex.render-runtime@8.13.1/public/_types/react":
+  version "8.13.1"
+  resolved "https://lucas--storecomponents.myvtex.com/_v/public/typings/v1/vtex.render-runtime@8.13.1/public/_types/react#274f70ab8d8f8254c17ee135ef0088bfaf057216"
+
 w3c-hr-time@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/w3c-hr-time/-/w3c-hr-time-1.0.1.tgz#82ac2bff63d950ea9e3189a58a65625fedf19045"

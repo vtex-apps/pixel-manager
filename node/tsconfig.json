@@ -1,9 +1,11 @@
 {
   "compilerOptions": {
+    "lib": ["es2017"],
     "types": ["bluebird-global", "node", "koa"],
     "typeRoots": ["node_modules/@types"],
     "target": "es2017",
-    "module": "commonjs",
+    "moduleResolution": "node",
+    "module": "es6",
     "sourceMap": false,
     "allowJs": true,
     "noUnusedLocals": true,

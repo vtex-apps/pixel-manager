@@ -3,14 +3,14 @@
   "version": "0.0.0",
   "private": true,
   "dependencies": {
-    "@vtex/api": "^1.5.1",
+    "@vtex/api": "^2.3.5",
     "ramda": "^0.26.1"
   },
   "devDependencies": {
     "@types/bluebird": "^3.5.25",
     "@types/bluebird-global": "^3.5.9",
     "@types/koa": "^2.0.39",
-    "@types/node": "^7.0.8",
+    "@types/node": "^11.11.3",
     "@types/ramda": "types/npm-ramda#dist",
     "eslint": "^5.15.2",
     "eslint-config-vtex": "^10.0.1",

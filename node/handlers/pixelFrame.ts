@@ -22,8 +22,7 @@ const pixelFrame = async (ctx: StoreContext) => {
   const isLinked = manifest.version.includes('+build')
   const basePath = isLinked ? LINKED_BASE_PATH : PUBLISHED_BASE_PATH
 
-  const scripts = appFiles
-    .data
+  const scripts = appFiles.data
     .map(file => file.path)
     .filter(path => path.startsWith('public/react') && !path.endsWith('map'))
     .filter(path => !/\.min\.js$/.test(path))
