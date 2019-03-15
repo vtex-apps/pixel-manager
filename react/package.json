@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "test": "jest",
-    "lint": "tsc --noEmit --pretty && eslint './**/*.ts'"
+    "lint": "tsc --noEmit --pretty && eslint --ext ts,tsx ."
   },
   "dependencies": {
     "apollo-client": "^2.4.7",
