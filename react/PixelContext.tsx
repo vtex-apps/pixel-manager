@@ -97,14 +97,17 @@ class PixelProvider extends Component<{}, ProviderState> {
    */
   public notifySubscribers = (data: PixelData) => {
     this.state.subscribers.forEach((subscriber: Subscriber) => {
-      if (!data.event || !subscriber[data.event]) {
+      if (!data.event) {
         return
       }
 
-      // don't know why I need to add the bang here
-      // since I check for `!subscriber[data.event]`
-      // above, but typescript complains without it.
-      subscriber[data.event]!(data)
+      const listener = subscriber[data.event]
+
+      if (typeof listener !== 'function') {
+        return
+      }
+
+      listener(data)
     })
   }
 

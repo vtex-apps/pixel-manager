@@ -17,7 +17,9 @@ const PixelManager: React.SFC<Partial<DataProps<Data, {}>>> = ({ data }) => {
 
   return (
     <Fragment>
-      {data.installedPixels.map(pixel => <PixelIFrame key={pixel} pixel={pixel} />)}
+      {data.installedPixels.map(pixel => (
+        <PixelIFrame key={pixel} pixel={pixel} />
+      ))}
     </Fragment>
   )
 }
