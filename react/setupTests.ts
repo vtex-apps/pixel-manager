@@ -1,3 +1,4 @@
+/* global global */
 import * as Enzyme from 'enzyme'
 import * as Adapter from 'enzyme-adapter-react-16'
 import { JSDOM } from 'jsdom'
@@ -8,6 +9,7 @@ const jsdom = new JSDOM('<!doctype html><html><body></body></html>')
 
 Enzyme.configure({ adapter: new Adapter() })
 
+// @ts-ignore
 window.matchMedia =
   window.matchMedia ||
   (() => {
