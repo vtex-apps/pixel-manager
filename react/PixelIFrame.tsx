@@ -15,6 +15,12 @@ const WHITELIST = [
   'vtex.google-analytics'
 ]
 
+const ACCOUNT_WHITELIST = ['boticario']
+
+const isWhitelisted = (app: string, accountName: string): boolean => {
+  return WHITELIST.includes(app) || ACCOUNT_WHITELIST.includes(accountName)
+}
+
 const sendEvent = (frameWindow: Window, data: PixelData) => {
   frameWindow.postMessage(data, '*')
 }
@@ -24,6 +30,7 @@ const PixelIFrame: React.FunctionComponent<Props> = ({ pixel }) => {
 
   const {
     culture: { currency },
+    account,
   } = useRuntime()
   const { subscribe } = usePixel()
 
@@ -68,7 +75,7 @@ const PixelIFrame: React.FunctionComponent<Props> = ({ pixel }) => {
     <iframe
       title={pixel}
       hidden
-      sandbox={WHITELIST.includes(appName) ? undefined : 'allow-scripts'}
+      sandbox={isWhitelisted(appName, account) ? undefined : 'allow-scripts'}
       src={`/tracking-frame/${pixel}`}
       ref={frame}
     />
