@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.0] - 2019-03-18
+### Changed
+- Added `gocommerce.google-analytics` to sandbox whitelist.
+
 ## [0.4.0] - 2019-03-13
 ### Changed
 - Filter apps by `pixel` policy.
