@@ -14,6 +14,7 @@ type EventType =
   | 'pageView'
   | 'addToCart'
   | 'removeFromCart'
+  | 'pageComponentInteraction'
 
 export interface PixelData {
   event?: EventType
@@ -81,10 +82,12 @@ class PixelProvider extends Component<{}, ProviderState> {
 
   public componentDidMount() {
     window.addEventListener('online', this.sendQueuedEvents)
+    window.addEventListener('message', this.handleWindowMessages)
   }
 
   public componentWillUnmount() {
     window.removeEventListener('online', this.sendQueuedEvents)
+    window.removeEventListener('message', this.handleWindowMessages)
   }
 
   /**
@@ -172,6 +175,15 @@ class PixelProvider extends Component<{}, ProviderState> {
     localStorage.pixelQueue = JSON.stringify([])
 
     this.sendingEvents = false
+  }
+
+  private handleWindowMessages = (e: any) => {
+    if (e.data.pageComponentInteraction) {
+      this.push({
+        event: 'pageComponentInteraction',
+        data: e.data,
+      })
+    }
   }
 }
 

@@ -54,6 +54,7 @@ const PixelIFrame: React.FunctionComponent<Props> = ({ pixel }) => {
       pageView: pixelEventHandler('pageView'),
       productView: pixelEventHandler('productView'),
       removeFromCart: pixelEventHandler('removeFromCart'),
+      pageComponentInteraction: pixelEventHandler('pageComponentInteraction'),
     })
 
     return () => unsubscribe()
