@@ -6,6 +6,7 @@ const SUBSCRIPTION_TIMEOUT = 100
 type EventType =
   | 'homeView'
   | 'productView'
+  | 'productClick'
   | 'otherView'
   | 'categoryView'
   | 'departmentView'
