@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.0] - 2019-05-02
+### Added
+- Added new type of event, productClick.
+
 ## [0.6.0] - 2019-03-21
 ### Added
 - Added `pageComponentInteraction` metric handling
