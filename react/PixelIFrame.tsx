@@ -12,6 +12,7 @@ interface Props {
 const WHITELIST = [
   'vtex.request-capture',
   'gocommerce.google-analytics',
+  'vtex.google-analytics'
 ]
 
 const sendEvent = (frameWindow: Window, data: PixelData) => {

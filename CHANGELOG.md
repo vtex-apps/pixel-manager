@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.0] - 2019-05-03
+### Added
+- Added vtex.google-analytics app to whitelist.
+
 ## [0.7.0] - 2019-05-02
 ### Added
 - Added new type of event, productClick.
