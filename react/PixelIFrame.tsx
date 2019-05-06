@@ -12,7 +12,7 @@ interface Props {
 const WHITELIST = [
   'vtex.request-capture',
   'gocommerce.google-analytics',
-  'vtex.google-analytics'
+  'vtex.google-analytics',
 ]
 
 const ACCOUNT_WHITELIST = ['boticario']
