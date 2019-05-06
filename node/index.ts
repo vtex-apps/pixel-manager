@@ -4,7 +4,9 @@ import pixelFrame from './handlers/pixelFrame'
 import { resolvers } from './resolvers'
 import Resources from './resources'
 
-const prepare = (handler: (ctx: StoreContext) => Promise<void>) => async (ctx: StoreContext) => {
+const prepare = (handler: (ctx: StoreContext) => Promise<void>) => async (
+  ctx: StoreContext
+) => {
   ctx.resources = new Resources(ctx)
 
   try {
@@ -37,5 +39,5 @@ export default {
   },
   routes: map(prepare, {
     pixelFrame,
-  })
+  }),
 }

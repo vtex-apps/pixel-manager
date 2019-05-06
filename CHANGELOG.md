@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.0] - 2019-05-06
+### Added
+- Add account whitelist.
+
 ## [0.8.0] - 2019-05-03
 ### Added
 - Added vtex.google-analytics app to whitelist.

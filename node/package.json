@@ -3,22 +3,22 @@
   "version": "0.0.0",
   "private": true,
   "dependencies": {
-    "@vtex/api": "^1.5.1",
+    "@vtex/api": "^2.3.5",
     "ramda": "^0.26.1"
   },
   "devDependencies": {
     "@types/bluebird": "^3.5.25",
     "@types/bluebird-global": "^3.5.9",
     "@types/koa": "^2.0.39",
-    "@types/node": "^7.0.8",
+    "@types/node": "^11.11.3",
     "@types/ramda": "types/npm-ramda#dist",
-    "prettier": "1.7.4",
-    "tslint": "^5.8.0",
-    "tslint-config-vtex": "^2.0.0",
-    "typescript": "^2.8.1"
+    "eslint": "^5.15.2",
+    "eslint-config-vtex": "^10.0.1",
+    "prettier": "^1.16.4",
+    "typescript": "^3.3.3333"
   },
   "scripts": {
-    "lint": "tsc --noEmit --pretty && tslint -c tslint.json './**/*.ts'"
+    "lint": "tsc --noEmit --pretty && eslint --ext ts,tsx ."
   },
   "license": "UNLICENSED"
 }

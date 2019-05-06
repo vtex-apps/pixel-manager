@@ -12,8 +12,14 @@ interface Props {
 const WHITELIST = [
   'vtex.request-capture',
   'gocommerce.google-analytics',
-  'vtex.google-analytics'
+  'vtex.google-analytics',
 ]
+
+const ACCOUNT_WHITELIST = ['boticario']
+
+const isWhitelisted = (app: string, accountName: string): boolean => {
+  return WHITELIST.includes(app) || ACCOUNT_WHITELIST.includes(accountName)
+}
 
 const sendEvent = (frameWindow: Window, data: PixelData) => {
   frameWindow.postMessage(data, '*')
@@ -22,28 +28,29 @@ const sendEvent = (frameWindow: Window, data: PixelData) => {
 const PixelIFrame: React.FunctionComponent<Props> = ({ pixel }) => {
   const frame: React.RefObject<HTMLIFrameElement> = useRef(null)
 
-  const runtime = useRuntime()
+  const {
+    culture: { currency },
+    account,
+  } = useRuntime()
   const { subscribe } = usePixel()
 
-  const pixelEventHandler = (event: string) => (data: PixelData) => {
-    if (frame.current === null || frame.current.contentWindow === null) {
-      return
-    }
-
-    const { culture: { currency } } = runtime
-
-    const eventName = `vtex:${event}`
-
-    const eventData = {
-      currency,
-      eventName,
-      ...data,
-    }
-
-    sendEvent(frame.current.contentWindow, eventData)
-  }
-
   useEffect(() => {
+    const pixelEventHandler = (event: string) => (data: PixelData) => {
+      if (frame.current === null || frame.current.contentWindow === null) {
+        return
+      }
+
+      const eventName = `vtex:${event}`
+
+      const eventData = {
+        currency,
+        eventName,
+        ...data,
+      }
+
+      sendEvent(frame.current.contentWindow, eventData)
+    }
+
     const unsubscribe = subscribe({
       addToCart: pixelEventHandler('addToCart'),
       categoryView: pixelEventHandler('categoryView'),
@@ -60,14 +67,15 @@ const PixelIFrame: React.FunctionComponent<Props> = ({ pixel }) => {
     })
 
     return () => unsubscribe()
-  }, [runtime.culture.currency, pixel])
+  }, [currency, pixel, subscribe])
 
   const [appName] = pixel.split('@')
 
   return (
     <iframe
+      title={pixel}
       hidden
-      sandbox={WHITELIST.includes(appName) ? undefined : 'allow-scripts'}
+      sandbox={isWhitelisted(appName, account) ? undefined : 'allow-scripts'}
       src={`/tracking-frame/${pixel}`}
       ref={frame}
     />
