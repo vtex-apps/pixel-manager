@@ -1,16 +1,8 @@
 import React, { Fragment } from 'react'
-import { DataProps, graphql } from 'react-apollo'
-
 import PixelIFrame from './PixelIFrame'
-import installedPixelsQuery from './queries/installedPixelsQuery.gql'
+import withInstalledPixels, { PixelsDataProps } from './queries/withInstalledPixels'
 
-interface Data {
-  installedPixels: string[]
-}
-
-const withInstalledPixels = graphql<{}, Data>(installedPixelsQuery)
-
-const PixelManager: React.SFC<Partial<DataProps<Data, {}>>> = ({ data }) => {
+const PixelManager: React.SFC<Partial<PixelsDataProps>> = ({ data }) => {
   if (!data || data.loading || !data.installedPixels) {
     return null
   }
