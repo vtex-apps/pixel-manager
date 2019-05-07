@@ -1,5 +1,5 @@
-import { nth, zip, prop, map } from 'ramda'
-import { Apps, LRUCache } from '@vtex/api'
+import { Apps, IOContext, LRUCache } from '@vtex/api'
+import { map, nth, prop, zip } from 'ramda'
 
 import { getAppMajor } from '../utils/conf'
 
@@ -12,7 +12,7 @@ const cacheStorage = new LRUCache<string, any>({
 })
 
 export const queries = {
-  installedPixels: async (_, __, { vtex }) => {
+  installedPixels: async (_: any, __: any, { vtex }: { vtex: IOContext } ) => {
     const opts = { cacheStorage }
     const withLongTimeout = { ...opts, timeout: LONG_TIMEOUT }
 

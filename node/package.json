@@ -3,10 +3,10 @@
   "version": "0.0.0",
   "private": true,
   "dependencies": {
-    "@vtex/api": "^2.3.5",
     "ramda": "^0.26.1"
   },
   "devDependencies": {
+    "@vtex/api": "^3.9.2",
     "@types/bluebird": "^3.5.25",
     "@types/bluebird-global": "^3.5.9",
     "@types/koa": "^2.0.39",

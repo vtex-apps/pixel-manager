@@ -77,7 +77,7 @@ const PixelIFrame: React.FunctionComponent<Props> = ({ pixel }) => {
       title={pixel}
       hidden
       sandbox={isWhitelisted(appName, account) ? undefined : 'allow-scripts'}
-      src={`/tracking-frame/${pixel}`}
+      src={`/_v/public/tracking-frame/${pixel}`}
       ref={frame}
     />
   )

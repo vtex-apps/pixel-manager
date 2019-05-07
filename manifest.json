@@ -6,7 +6,7 @@
   "description": "The VTEX Pixel Manager App.",
   "builders": {
     "graphql": "1.x",
-    "node": "3.x",
+    "node": "4.x",
     "react": "3.x"
   },
   "scripts": {
