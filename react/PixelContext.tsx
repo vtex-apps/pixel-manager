@@ -1,8 +1,6 @@
 import hoistNonReactStatics from 'hoist-non-react-statics'
 import React, { Component, useContext, createContext } from 'react'
 
-const SUBSCRIPTION_TIMEOUT = 100
-
 type EventType =
   | 'homeView'
   | 'productView'
@@ -25,14 +23,14 @@ export interface PixelData {
 
 type PixelEventHandler = (data: PixelData) => void
 
-export type Subscriber = { [E in EventType]?: PixelEventHandler }
+type Subscriber = { [E in EventType]?: PixelEventHandler }
 
-export interface ContextType {
+export interface PixelContextType {
   subscribe: (s: Subscriber) => () => void
   push: (data: PixelData) => void
 }
 
-const PixelContext = createContext<ContextType>({
+const PixelContext = createContext<PixelContextType>({
   push: () => undefined,
   subscribe: () => () => undefined,
 })
@@ -48,7 +46,7 @@ const getPixelQueue = (): PixelData[] =>
  * Wrapped Component. This component will be used by the installed apps.
  */
 export function Pixel<T>(
-  WrappedComponent: React.ComponentType<T & ContextType>
+  WrappedComponent: React.ComponentType<T & PixelContextType>
 ) {
   const PixelComponent: React.SFC<T> = props => (
     <PixelContext.Consumer>
@@ -80,7 +78,19 @@ class PixelProvider extends Component<{}, ProviderState> {
     subscribers: [],
   }
 
+  private pixelContextValue: PixelContextType
+
   private sendingEvents = false
+
+  constructor(props: any) {
+    super(props)
+
+    this.pixelContextValue = {
+      push: this.push,
+      subscribe: this.subscribe,
+    }
+  }
+
 
   public componentDidMount() {
     window.addEventListener('online', this.sendQueuedEvents)
@@ -117,7 +127,8 @@ class PixelProvider extends Component<{}, ProviderState> {
    */
   public push = (data: PixelData) => {
     const notify = () => {
-      if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      const offline = typeof navigator !== 'undefined' && !navigator.onLine
+      if (offline) {
         const pixelQueue: PixelData[] = getPixelQueue()
 
         pixelQueue.push(data)
@@ -128,11 +139,7 @@ class PixelProvider extends Component<{}, ProviderState> {
       }
     }
 
-    if (this.state.subscribers.length === 0) {
-      setTimeout(notify, SUBSCRIPTION_TIMEOUT)
-    } else {
-      notify()
-    }
+    notify()
   }
 
   /**
@@ -156,12 +163,7 @@ class PixelProvider extends Component<{}, ProviderState> {
 
   public render() {
     return (
-      <PixelContext.Provider
-        value={{
-          push: this.push,
-          subscribe: this.subscribe,
-        }}
-      >
+      <PixelContext.Provider value={this.pixelContextValue}>
         {this.props.children}
       </PixelContext.Provider>
     )
@@ -185,8 +187,8 @@ class PixelProvider extends Component<{}, ProviderState> {
   private handleWindowMessages = (e: any) => {
     if (e.data.pageComponentInteraction) {
       this.push({
-        event: 'pageComponentInteraction',
         data: e.data,
+        event: 'pageComponentInteraction',
       })
     }
   }
