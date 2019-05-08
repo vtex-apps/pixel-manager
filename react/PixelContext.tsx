@@ -144,6 +144,15 @@ class PixelProvider extends Component<{}, ProviderState> {
       }
     }
 
+    // Add all events to window when is linking to ease debugging
+    // **Don't make those if's one!**
+    if (process.env.NODE_ENV === 'development') {
+      if (typeof window !== 'undefined') {
+        window.pixelManagerEvents = window.pixelManagerEvents || []
+        window.pixelManagerEvents.push(data)
+      }
+    }
+
     notify()
   }
 
