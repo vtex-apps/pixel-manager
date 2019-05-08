@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Cache to pixels routes
+
+### Changed
+
+- Update to node@4.x
+
+### Fixed
+
+- Avoid triggering events before pixels are loaded
+- Usage of localStorage
+
 ## [0.10.0] - 2019-05-07
 
 ### Added
