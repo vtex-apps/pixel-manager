@@ -39,7 +39,7 @@ const getDisplayName = (comp: React.ComponentType<any>) =>
   comp.displayName || comp.name || 'Component'
 
 const getPixelQueue = (): PixelData[] =>
-  localStorage.pixelQueue ? JSON.parse(localStorage.pixelQueue) : []
+  localStorage.getItem('pixelQueue') ? JSON.parse(localStorage.getItem('pixelQueue')!) : []
 
 /**
  * Pixel is the HOC Component that provides an event subscription to the
@@ -133,8 +133,13 @@ class PixelProvider extends Component<{}, ProviderState> {
 
         pixelQueue.push(data)
 
-        localStorage.pixelQueue = JSON.stringify(pixelQueue)
+        try {
+          localStorage.setItem('pixelQueue', JSON.stringify(pixelQueue))
+        } catch (e) {
+          // localStorage might be full
+        }
       } else {
+        localStorage.removeItem('pixelQueue')
         this.notifySubscribers(data)
       }
     }
@@ -179,7 +184,7 @@ class PixelProvider extends Component<{}, ProviderState> {
     const pixelQueue: PixelData[] = getPixelQueue()
 
     pixelQueue.forEach(queuedEvent => this.notifySubscribers(queuedEvent))
-    localStorage.pixelQueue = JSON.stringify([])
+    localStorage.removeItem('pixelQueue')
 
     this.sendingEvents = false
   }
