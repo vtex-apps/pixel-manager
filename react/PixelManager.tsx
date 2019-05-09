@@ -1,6 +1,8 @@
 import React, { Fragment } from 'react'
 import PixelIFrame from './PixelIFrame'
-import withInstalledPixels, { PixelsDataProps } from './queries/withInstalledPixels'
+import withInstalledPixels, {
+  PixelsDataProps,
+} from './queries/withInstalledPixels'
 
 const PixelManager: React.SFC<Partial<PixelsDataProps>> = ({ data }) => {
   if (!data || data.loading || !data.installedPixels) {

@@ -39,7 +39,9 @@ const getDisplayName = (comp: React.ComponentType<any>) =>
   comp.displayName || comp.name || 'Component'
 
 const getPixelQueue = (): PixelData[] =>
-  localStorage.getItem('pixelQueue') ? JSON.parse(localStorage.getItem('pixelQueue')!) : []
+  localStorage.getItem('pixelQueue')
+    ? JSON.parse(localStorage.getItem('pixelQueue')!) // eslint-disable-line
+    : []
 
 /**
  * Pixel is the HOC Component that provides an event subscription to the
@@ -69,6 +71,12 @@ interface ProviderState {
   subscribers: Subscriber[]
 }
 
+declare var process: {
+  env: {
+    NODE_ENV: 'production' | 'development'
+  }
+}
+
 /**
  * HOC Component that has the Pixel logic, dispatching store events
  * to the subscribed external components.
@@ -82,7 +90,7 @@ class PixelProvider extends Component<{}, ProviderState> {
 
   private sendingEvents = false
 
-  constructor(props: any) {
+  public constructor(props: {}) {
     super(props)
 
     this.pixelContextValue = {
@@ -90,7 +98,6 @@ class PixelProvider extends Component<{}, ProviderState> {
       subscribe: this.subscribe,
     }
   }
-
 
   public componentDidMount() {
     window.addEventListener('online', this.sendQueuedEvents)

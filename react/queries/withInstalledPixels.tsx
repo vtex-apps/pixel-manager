@@ -1,7 +1,6 @@
 import installedPixelsQuery from './installedPixelsQuery.gql'
 import { DataProps, graphql } from 'react-apollo'
 
-
 interface Data {
   installedPixels: string[]
 }

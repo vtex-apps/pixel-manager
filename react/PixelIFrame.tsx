@@ -39,6 +39,7 @@ const PixelIFrame: React.FunctionComponent<Props> = ({ pixel }) => {
     setLoadComplete(true)
     if (pastEventsRef.current && pastEventsRef.current.length > 0) {
       pastEventsRef.current.forEach(event => {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         sendEvent(frame.current!.contentWindow!, event)
       })
     }
