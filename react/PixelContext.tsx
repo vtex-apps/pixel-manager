@@ -28,11 +28,13 @@ type Subscriber = { [E in EventType]?: PixelEventHandler }
 export interface PixelContextType {
   subscribe: (s: Subscriber) => () => void
   push: (data: PixelData) => void
+  getFirstEvents: () => PixelData[]
 }
 
 const PixelContext = createContext<PixelContextType>({
   push: () => undefined,
   subscribe: () => () => undefined,
+  getFirstEvents: () => [],
 })
 
 const getDisplayName = (comp: React.ComponentType<any>) =>
@@ -52,8 +54,13 @@ export function Pixel<T>(
 ) {
   const PixelComponent: React.SFC<T> = props => (
     <PixelContext.Consumer>
-      {({ subscribe, push }) => (
-        <WrappedComponent {...props} push={push} subscribe={subscribe} />
+      {({ subscribe, push, getFirstEvents }) => (
+        <WrappedComponent
+          {...props}
+          push={push}
+          subscribe={subscribe}
+          getFirstEvents={getFirstEvents}
+        />
       )}
     </PixelContext.Consumer>
   )
@@ -89,6 +96,9 @@ class PixelProvider extends Component<{}, ProviderState> {
   private pixelContextValue: PixelContextType
 
   private sendingEvents = false
+  private firstEvents: PixelData[] = []
+  private firstEventsTimeout: NodeJS.Timeout | undefined
+  private timeout: boolean = false
 
   public constructor(props: {}) {
     super(props)
@@ -96,15 +106,22 @@ class PixelProvider extends Component<{}, ProviderState> {
     this.pixelContextValue = {
       push: this.push,
       subscribe: this.subscribe,
+      getFirstEvents: this.getFirstEvents,
     }
   }
 
   public componentDidMount() {
+    this.firstEventsTimeout = setTimeout(() => {
+      this.timeout = true
+    }, 7000)
     window.addEventListener('online', this.sendQueuedEvents)
     window.addEventListener('message', this.handleWindowMessages)
   }
 
   public componentWillUnmount() {
+    if (this.firstEventsTimeout) {
+      clearTimeout(this.firstEventsTimeout)
+    }
     window.removeEventListener('online', this.sendQueuedEvents)
     window.removeEventListener('message', this.handleWindowMessages)
   }
@@ -127,6 +144,10 @@ class PixelProvider extends Component<{}, ProviderState> {
 
       listener(data)
     })
+
+    if (!this.timeout) {
+      this.firstEvents.push(data)
+    }
   }
 
   /**
@@ -180,6 +201,10 @@ class PixelProvider extends Component<{}, ProviderState> {
         subscribers: state.subscribers.filter(sub => sub !== subscriber),
       }))
     }
+  }
+
+  public getFirstEvents = () => {
+    return this.firstEvents
   }
 
   public render() {
