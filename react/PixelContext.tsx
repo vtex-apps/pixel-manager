@@ -215,4 +215,4 @@ class PixelProvider extends Component<{}, ProviderState> {
   }
 }
 
-export default { Pixel, PixelProvider }
+export default { Pixel, PixelProvider, usePixel }
