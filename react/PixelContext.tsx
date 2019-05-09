@@ -1,8 +1,6 @@
 import hoistNonReactStatics from 'hoist-non-react-statics'
 import React, { Component, useContext, createContext } from 'react'
 
-const SUBSCRIPTION_TIMEOUT = 100
-
 type EventType =
   | 'homeView'
   | 'productView'
@@ -25,14 +23,14 @@ export interface PixelData {
 
 type PixelEventHandler = (data: PixelData) => void
 
-export type Subscriber = { [E in EventType]?: PixelEventHandler }
+type Subscriber = { [E in EventType]?: PixelEventHandler }
 
-export interface ContextType {
+export interface PixelContextType {
   subscribe: (s: Subscriber) => () => void
   push: (data: PixelData) => void
 }
 
-const PixelContext = createContext<ContextType>({
+const PixelContext = createContext<PixelContextType>({
   push: () => undefined,
   subscribe: () => () => undefined,
 })
@@ -41,14 +39,16 @@ const getDisplayName = (comp: React.ComponentType<any>) =>
   comp.displayName || comp.name || 'Component'
 
 const getPixelQueue = (): PixelData[] =>
-  localStorage.pixelQueue ? JSON.parse(localStorage.pixelQueue) : []
+  localStorage.getItem('pixelQueue')
+    ? JSON.parse(localStorage.getItem('pixelQueue')!) // eslint-disable-line
+    : []
 
 /**
  * Pixel is the HOC Component that provides an event subscription to the
  * Wrapped Component. This component will be used by the installed apps.
  */
 export function Pixel<T>(
-  WrappedComponent: React.ComponentType<T & ContextType>
+  WrappedComponent: React.ComponentType<T & PixelContextType>
 ) {
   const PixelComponent: React.SFC<T> = props => (
     <PixelContext.Consumer>
@@ -71,6 +71,12 @@ interface ProviderState {
   subscribers: Subscriber[]
 }
 
+declare var process: {
+  env: {
+    NODE_ENV: 'production' | 'development'
+  }
+}
+
 /**
  * HOC Component that has the Pixel logic, dispatching store events
  * to the subscribed external components.
@@ -80,7 +86,18 @@ class PixelProvider extends Component<{}, ProviderState> {
     subscribers: [],
   }
 
+  private pixelContextValue: PixelContextType
+
   private sendingEvents = false
+
+  public constructor(props: {}) {
+    super(props)
+
+    this.pixelContextValue = {
+      push: this.push,
+      subscribe: this.subscribe,
+    }
+  }
 
   public componentDidMount() {
     window.addEventListener('online', this.sendQueuedEvents)
@@ -117,22 +134,33 @@ class PixelProvider extends Component<{}, ProviderState> {
    */
   public push = (data: PixelData) => {
     const notify = () => {
-      if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      const offline = typeof navigator !== 'undefined' && !navigator.onLine
+      if (offline) {
         const pixelQueue: PixelData[] = getPixelQueue()
 
         pixelQueue.push(data)
 
-        localStorage.pixelQueue = JSON.stringify(pixelQueue)
+        try {
+          localStorage.setItem('pixelQueue', JSON.stringify(pixelQueue))
+        } catch (e) {
+          // localStorage might be full
+        }
       } else {
+        localStorage.removeItem('pixelQueue')
         this.notifySubscribers(data)
       }
     }
 
-    if (this.state.subscribers.length === 0) {
-      setTimeout(notify, SUBSCRIPTION_TIMEOUT)
-    } else {
-      notify()
+    // Add all events to window when is linking to ease debugging
+    // **Don't make those if's one!**
+    if (process.env.NODE_ENV === 'development') {
+      if (typeof window !== 'undefined') {
+        window.pixelManagerEvents = window.pixelManagerEvents || []
+        window.pixelManagerEvents.push(data)
+      }
     }
+
+    notify()
   }
 
   /**
@@ -156,12 +184,7 @@ class PixelProvider extends Component<{}, ProviderState> {
 
   public render() {
     return (
-      <PixelContext.Provider
-        value={{
-          push: this.push,
-          subscribe: this.subscribe,
-        }}
-      >
+      <PixelContext.Provider value={this.pixelContextValue}>
         {this.props.children}
       </PixelContext.Provider>
     )
@@ -177,7 +200,7 @@ class PixelProvider extends Component<{}, ProviderState> {
     const pixelQueue: PixelData[] = getPixelQueue()
 
     pixelQueue.forEach(queuedEvent => this.notifySubscribers(queuedEvent))
-    localStorage.pixelQueue = JSON.stringify([])
+    localStorage.removeItem('pixelQueue')
 
     this.sendingEvents = false
   }
@@ -185,8 +208,8 @@ class PixelProvider extends Component<{}, ProviderState> {
   private handleWindowMessages = (e: any) => {
     if (e.data.pageComponentInteraction) {
       this.push({
-        event: 'pageComponentInteraction',
         data: e.data,
+        event: 'pageComponentInteraction',
       })
     }
   }
