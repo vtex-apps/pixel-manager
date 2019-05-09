@@ -24,6 +24,14 @@ const sendEvent = (frameWindow: Window, data: PixelData) => {
   frameWindow.postMessage(data, '*')
 }
 
+function enhanceEvent(event: PixelData, currency: string) {
+  return {
+    currency,
+    eventName: `vtex:${event.event}`,
+    ...event,
+  }
+}
+
 const PixelIFrame: React.FunctionComponent<Props> = ({ pixel }) => {
   const frame = useRef<HTMLIFrameElement>(null)
   const [isLoaded, setLoadComplete] = useState(false)
@@ -33,29 +41,33 @@ const PixelIFrame: React.FunctionComponent<Props> = ({ pixel }) => {
     culture: { currency },
     account,
   } = useRuntime()
-  const { subscribe } = usePixel()
+  const { subscribe, getFirstEvents } = usePixel()
 
   const onLoad = () => {
     setLoadComplete(true)
-    if (pastEventsRef.current && pastEventsRef.current.length > 0) {
-      pastEventsRef.current.forEach(event => {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        sendEvent(frame.current!.contentWindow!, event)
-      })
-    }
+
+    // If the effect already ran, we use ref, otherwise we use `getFirstEvents`
+    const lostEvents =
+      pastEventsRef.current && pastEventsRef.current.length > 0
+        ? pastEventsRef.current
+        : getFirstEvents().map(event => enhanceEvent(event, currency))
+
+    lostEvents.forEach(event => {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      sendEvent(frame.current!.contentWindow!, event)
+    })
   }
 
   useEffect(() => {
-    const pixelEventHandler = (event: string) => (data: PixelData) => {
-      const eventName = `vtex:${event}`
-
-      const eventData = {
-        currency,
-        eventName,
-        ...data,
-      }
+    const pixelEventHandler = (event: PixelData) => {
+      const eventData = enhanceEvent(event, currency)
 
       if (!isLoaded) {
+        // In case it's the first time filling this ref, get the lost events
+        // until now from `getFirstEvents`
+        if (!pastEventsRef.current) {
+          pastEventsRef.current = [getFirstEvents()]
+        }
         pastEventsRef.current = [...pastEventsRef.current, eventData]
         return
       }
@@ -68,23 +80,23 @@ const PixelIFrame: React.FunctionComponent<Props> = ({ pixel }) => {
     }
 
     const unsubscribe = subscribe({
-      addToCart: pixelEventHandler('addToCart'),
-      categoryView: pixelEventHandler('categoryView'),
-      departmentView: pixelEventHandler('departmentView'),
-      homeView: pixelEventHandler('homeView'),
-      internalSiteSearchView: pixelEventHandler('internalSiteSearchView'),
-      otherView: pixelEventHandler('otherView'),
-      orderPlaced: pixelEventHandler('orderPlaced'),
-      pageComponentInteraction: pixelEventHandler('pageComponentInteraction'),
-      pageInfo: pixelEventHandler('pageInfo'),
-      pageView: pixelEventHandler('pageView'),
-      productClick: pixelEventHandler('productClick'),
-      productView: pixelEventHandler('productView'),
-      removeFromCart: pixelEventHandler('removeFromCart'),
+      addToCart: pixelEventHandler,
+      categoryView: pixelEventHandler,
+      departmentView: pixelEventHandler,
+      homeView: pixelEventHandler,
+      internalSiteSearchView: pixelEventHandler,
+      otherView: pixelEventHandler,
+      orderPlaced: pixelEventHandler,
+      pageComponentInteraction: pixelEventHandler,
+      pageInfo: pixelEventHandler,
+      pageView: pixelEventHandler,
+      productClick: pixelEventHandler,
+      productView: pixelEventHandler,
+      removeFromCart: pixelEventHandler,
     })
 
     return () => unsubscribe()
-  }, [currency, pixel, subscribe, isLoaded])
+  }, [currency, pixel, subscribe, isLoaded, getFirstEvents])
 
   const [appName] = pixel.split('@')
 
