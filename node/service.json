@@ -1,6 +1,6 @@
 {
   "stack": "nodejs",
-  "memory": 2048,
+  "memory": 128,
   "ttl": 60,
   "timeout": 60,
   "minReplicas": 4,
