@@ -29,6 +29,10 @@ function enhanceEvent(event: PixelData, currency: string) {
   }
 }
 
+function enhanceFirstEvents(firstEvents: PixelData[], currency: string) {
+  return firstEvents.map(e => enhanceEvent(e, currency))
+}
+
 const PixelIFrame: React.FunctionComponent<Props> = ({ pixel }) => {
   const frame = useRef<HTMLIFrameElement>(null)
   const [isLoaded, setLoadComplete] = useState(false)
@@ -45,9 +49,9 @@ const PixelIFrame: React.FunctionComponent<Props> = ({ pixel }) => {
 
     // If the effect already ran, we use ref, otherwise we use `getFirstEvents`
     const lostEvents =
-      pastEventsRef.current && pastEventsRef.current.length > 0
+      pastEventsRef.current.length > 0
         ? pastEventsRef.current
-        : getFirstEvents().map(event => enhanceEvent(event, currency))
+        : enhanceFirstEvents(getFirstEvents(), currency)
 
     lostEvents.forEach(event => {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -62,10 +66,13 @@ const PixelIFrame: React.FunctionComponent<Props> = ({ pixel }) => {
       if (!isLoaded) {
         // In case it's the first time filling this ref, get the lost events
         // until now from `getFirstEvents`
-        if (!pastEventsRef.current) {
-          pastEventsRef.current = [getFirstEvents()]
+        if (pastEventsRef.current.length === 0) {
+          pastEventsRef.current = [
+            ...enhanceFirstEvents(getFirstEvents(), currency),
+          ]
         }
         pastEventsRef.current = [...pastEventsRef.current, eventData]
+
         return
       }
 
