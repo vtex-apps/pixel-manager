@@ -1,6 +1,7 @@
 import React, { memo, useRef, useEffect, useState } from 'react'
 import { useRuntime } from 'vtex.render-runtime'
 import { PixelData, usePixel } from './PixelContext'
+import sendEvent from './modules/sendEvent'
 
 interface Props {
   pixel: string
@@ -18,10 +19,6 @@ const ACCOUNT_WHITELIST = ['boticario']
 
 const isWhitelisted = (app: string, accountName: string): boolean => {
   return WHITELIST.includes(app) || ACCOUNT_WHITELIST.includes(accountName)
-}
-
-const sendEvent = (frameWindow: Window, data: PixelData) => {
-  frameWindow.postMessage(data, '*')
 }
 
 function enhanceEvent(event: PixelData, currency: string) {
