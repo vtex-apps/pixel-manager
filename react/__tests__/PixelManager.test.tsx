@@ -1,9 +1,6 @@
-import { mount } from 'enzyme'
 import React from 'react'
-import { MockedProvider } from 'react-apollo/test-utils'
-import wait from 'waait'
+import { render, wait } from '@vtex/test-tools/react'
 
-import PixelIFrame from '../PixelIFrame'
 import PixelManager from '../PixelManager'
 import installedPixelsQuery from '../queries/installedPixelsQuery.gql'
 
@@ -25,17 +22,13 @@ describe('<PixelManager />', () => {
       },
     ]
 
-    const wrapper = mount(
-      <MockedProvider mocks={mocks}>
-        <PixelManager />
-      </MockedProvider>
-    )
+    const { getByTitle } = render(<PixelManager />, {
+      graphql: { mocks },
+    })
 
-    await wait(0)
+    await wait(() => true)
 
-    wrapper.update()
-
-    expect(wrapper.find(PixelIFrame).length).toBe(2)
-    expect(wrapper.find('PixelManager')).toMatchSnapshot()
+    expect(getByTitle(mocks[0].result.data.installedPixels[0])).toBeDefined()
+    expect(getByTitle(mocks[0].result.data.installedPixels[1])).toBeDefined()
   })
 })
