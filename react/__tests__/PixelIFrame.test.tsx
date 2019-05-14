@@ -96,11 +96,12 @@ test('should unsubscribe', async () => {
   expect(unsubscribeMock).toHaveBeenCalledTimes(1)
 })
 
-test('should trigger past first events on load', () => {
+test('should trigger past first events triggered before rendering on load', () => {
   const { __pushEvent } = require('../PixelContext')
-  const { iframe } = renderComponent()
 
   __pushEvent({ event: 'pageView' })
+
+  const { iframe } = renderComponent()
 
   expect(sendEventMock.mock.calls).toHaveLength(0)
 
@@ -115,26 +116,45 @@ test('should trigger past first events on load', () => {
   })
 })
 
-test('should trigger events subscribed and past first events', () => {
-  const { __pushEvent } = require('../PixelContext')
+test('should trigger past first events triggered after subscribing but before on load', () => {
+  const { __pushEvent, usePixel } = require('../PixelContext')
+  const { subscribe: subscribeMock } = usePixel()
+
   const { iframe } = renderComponent()
 
+  expect(subscribeMock).toHaveBeenCalledTimes(1)
+  expect(sendEventMock).toHaveBeenCalledTimes(0)
+
   __pushEvent({ event: 'pageView' })
+
+  fireEvent.load(iframe)
+
+  const event = getEventArgument(sendEventMock.mock.calls[0])
+
+  expect(event).toMatchObject({
+    currency: 'BRL',
+    event: 'pageView',
+    eventName: 'vtex:pageView',
+  })
+})
+
+test('should trigger events subscribed and past first events', () => {
+  const { __pushEvent } = require('../PixelContext')
+
+  __pushEvent({ event: 'pageView' })
+
+  const { iframe } = renderComponent()
+
   __pushEvent({ event: 'pageInfo', data: 'baz' })
-  __pushEvent({ event: 'orderPlaced', data: 'foo' })
 
   expect(sendEventMock).toHaveBeenCalledTimes(0)
 
   fireEvent.load(iframe)
 
+  __pushEvent({ event: 'orderPlaced', data: 'foo' })
+
   expect(sendEventMock).toHaveBeenCalledTimes(3)
   expect(getEventArgument(sendEventMock.mock.calls[0]).event).toBe('pageView')
-
-  // Make sure events handled by subscriber are enhanced
-  expect(getEventArgument(sendEventMock.mock.calls[0]).eventName).toBe(
-    'vtex:pageView'
-  )
-
   expect(getEventArgument(sendEventMock.mock.calls[1]).event).toBe('pageInfo')
   expect(getEventArgument(sendEventMock.mock.calls[2]).event).toBe(
     'orderPlaced'
