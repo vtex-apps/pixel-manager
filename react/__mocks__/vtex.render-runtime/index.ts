@@ -1,5 +1,4 @@
-export function withRuntimeContext(comp: React.ComponentType<any>) {
-  return comp
-}
-
-export const useRuntime = () => ({})
+export const useRuntime = () => ({
+  culture: { currency: 'BRL' },
+  account: 'storecomponents',
+})

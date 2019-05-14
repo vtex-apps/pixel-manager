@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "test": "jest",
+    "test": "vtex-test-tools test",
     "lint": "tsc --noEmit --pretty && eslint --ext ts,tsx ."
   },
   "dependencies": {
@@ -14,29 +14,19 @@
     "react-apollo": "^2.3.3"
   },
   "devDependencies": {
-    "@types/enzyme": "^3.1.15",
-    "@types/enzyme-adapter-react-16": "^1.0.3",
     "@types/hoist-non-react-statics": "^3.0.1",
     "@types/jest": "^24.0.3",
-    "@types/jsdom": "^12.2.0",
     "@types/prop-types": "^15.5.8",
     "@types/ramda": "types/npm-ramda#dist",
     "@types/react": "^16.7.17",
+    "@vtex/test-tools": "^0.3.2",
     "apollo-cache-inmemory": "^1.3.12",
-    "enzyme": "^3.8.0",
-    "enzyme-adapter-react-16": "^1.7.1",
-    "enzyme-to-json": "^3.3.5",
     "eslint": "^5.15.2",
     "eslint-config-vtex-react": "^4.0.0",
     "graphql-tag": "^2.10.0",
-    "jest": "^23.6.0",
-    "jest-transform-graphql": "^2.1.0",
-    "jsdom": "^13.1.0",
     "prettier": "^1.16.4",
     "react": "^16.8.1",
     "react-dom": "^16.8.1",
-    "ts-jest": "^23.10.5",
-    "typescript": "^3.3.3333",
-    "waait": "^1.0.2"
+    "typescript": "^3.3.3333"
   }
 }
