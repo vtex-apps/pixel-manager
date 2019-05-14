@@ -48,8 +48,11 @@ const renderComponent = () => {
 
 beforeEach(() => {
   sendEventMock.mockClear()
-  const { __clear } = require('../PixelContext')
+  const { __clear, usePixel } = require('../PixelContext')
+  const { subscribe, getFirstEvents } = usePixel()
   __clear()
+  subscribe.mockClear()
+  getFirstEvents.mockClear()
 })
 
 test('should subscribe', () => {
