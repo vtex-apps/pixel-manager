@@ -1061,10 +1061,10 @@
     lodash.unescape "4.0.1"
     semver "5.5.0"
 
-"@vtex/test-tools@^0.3.1":
-  version "0.3.1"
-  resolved "https://registry.yarnpkg.com/@vtex/test-tools/-/test-tools-0.3.1.tgz#cc3fa0ca404cade22c6418d202bffb5dca13cfbf"
-  integrity sha512-WShfg7/pSQrvxgjqsJg7CTQ23eP9CdrNL1rD8GVbgg3hAuFXiz8qnxIWWijZZdOU7fbpp+BHVu8ILKU1RCNbGQ==
+"@vtex/test-tools@0.3.2":
+  version "0.3.2"
+  resolved "https://registry.yarnpkg.com/@vtex/test-tools/-/test-tools-0.3.2.tgz#f9423c98f1960b226d18dfe59d6d9c430e14d530"
+  integrity sha512-cVPc6sBymoHUvYbzEDhBmO+0Ga1JZQNZxtapIdG80TXwnZrFTJRueSp9uRcJAPOzQjwSvbknG7wXCeuHS4j7OA==
   dependencies:
     "@babel/core" "^7.3.4"
     "@babel/plugin-proposal-class-properties" "^7.3.4"

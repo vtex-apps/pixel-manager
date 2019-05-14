@@ -120,6 +120,8 @@ test('should trigger events subscribed and past first events', () => {
   __pushEvent({ event: 'pageInfo', data: 'baz' })
   __pushEvent({ event: 'orderPlaced', data: 'foo' })
 
+  expect(sendEventMock).toHaveBeenCalledTimes(0)
+
   fireEvent.load(iframe)
 
   expect(sendEventMock).toHaveBeenCalledTimes(3)
@@ -141,6 +143,8 @@ test('should not trigger duplicate events', () => {
   const { iframe } = renderComponent()
 
   __pushEvent({ event: 'pageView' })
+
+  expect(sendEventMock).toHaveBeenCalledTimes(0)
 
   fireEvent.load(iframe)
 
