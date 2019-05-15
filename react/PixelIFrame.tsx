@@ -9,11 +9,7 @@ interface Props {
 
 // internal: the apps bellow need special
 // access and are trusted.
-const WHITELIST = [
-  'vtex.request-capture',
-  'gocommerce.google-analytics',
-  'vtex.google-analytics',
-]
+const WHITELIST = ['vtex.request-capture']
 
 const ACCOUNT_WHITELIST = ['boticario']
 
@@ -104,12 +100,17 @@ const PixelIFrame: React.FunctionComponent<Props> = ({ pixel }) => {
 
   const [appName] = pixel.split('@')
 
+  const iframePolicy =
+    'allow-same-origin' + isWhitelisted(appName, account)
+      ? undefined
+      : 'allow-scripts'
+
   return (
     <iframe
       title={pixel}
       hidden
       onLoad={onLoad}
-      sandbox={isWhitelisted(appName, account) ? undefined : 'allow-scripts'}
+      sandbox={iframePolicy}
       src={`/_v/public/tracking-frame/${pixel}`}
       ref={frame}
     />

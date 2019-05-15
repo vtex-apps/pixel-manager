@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Allowed pixel iframe read parent cookies.
+
 ## [0.11.3] - 2019-05-14
 
 ### Fixed
@@ -19,11 +23,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Fix another race condition
+- Fix another race condition.
 
 ## [0.11.1] - 2019-05-09
 
 ### Fixed
+
 - Export `usePixel` in `PixelContext`.
 
 ## [0.11.0] - 2019-05-09
