@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Allowed pixel iframe read parent cookies.
+- Allow pixel iframe to read parent cookies.
 
 ## [0.11.3] - 2019-05-14
 
