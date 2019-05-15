@@ -101,9 +101,9 @@ const PixelIFrame: React.FunctionComponent<Props> = ({ pixel }) => {
   const [appName] = pixel.split('@')
 
   const iframePolicy =
-    'allow-same-origin' + isWhitelisted(appName, account)
-      ? undefined
-      : 'allow-scripts'
+    'allow-same-origin ' + isWhitelisted(appName, account)
+      ? 'allow-scripts'
+      : undefined
 
   return (
     <iframe
