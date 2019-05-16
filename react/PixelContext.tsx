@@ -5,6 +5,7 @@ type EventType =
   | 'homeView'
   | 'productView'
   | 'productClick'
+  | 'productImpression'
   | 'otherView'
   | 'categoryView'
   | 'departmentView'
