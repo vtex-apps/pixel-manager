@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 import React from 'react'
-import { render, fireEvent } from '@vtex/test-tools/react'
+import { render, fireEvent, wait, act } from '@vtex/test-tools/react'
 
 import PixelIFrame from '../PixelIFrame'
 import sendEvent from '../modules/sendEvent'
@@ -38,13 +38,42 @@ jest.mock('../PixelContext', () => {
 
 const getEventArgument = (callArgs: any[]) => callArgs[1]
 
+function getWindowFromNode(node: any) {
+  // istanbul ignore next I'm not sure what could cause the final else so we'll leave it uncovered.
+  if (node.defaultView) {
+    // node is document
+    return node.defaultView
+  } else if (node.ownerDocument) {
+    // node is a DOM node
+    return node.ownerDocument.defaultView
+  } else if (node.window) {
+    // node is window
+    return node.window
+  } else {
+    // no idea...
+    throw new Error(
+      `Unable to find the "window" object for the given node. fireEvent currently supports firing events on DOM nodes, document, and window. Please file an issue with the code that's causing you to see this error: https://github.com/testing-library/dom-testing-library/issues/new`,
+    )
+  }
+}
+
 const renderComponent = () => {
   const pixelName = 'vtex.pixel-name'
   const helpers = render(<PixelIFrame pixel={pixelName} />)
 
-  const iframe = helpers.getByTitle(pixelName)
+  const fireLoadEvent = (data?: string) => {
+    const iframe = helpers.getByTitle(pixelName) as HTMLIFrameElement
 
-  return { ...helpers, pixelName, iframe }
+    const window = getWindowFromNode(iframe)
+    const message = new window.MessageEvent('message', {
+      data: data ? data : 'pixel:ready:' + pixelName,
+      origin: `https://master--storecomponents.myvtex.com/_v/public/tracking-frame/${pixelName}`,
+      source: iframe.contentWindow
+    })
+    act(() => { window.dispatchEvent(message) })
+  }
+
+  return { ...helpers, pixelName, fireLoadEvent }
 }
 
 beforeEach(() => {
@@ -97,17 +126,15 @@ test('should unsubscribe', async () => {
   expect(unsubscribeMock).toHaveBeenCalledTimes(1)
 })
 
-test('should trigger past first events triggered before rendering on load', () => {
+test('should trigger past first events triggered before rendering on load', async () => {
   const { __pushEvent } = require('../PixelContext')
-
   __pushEvent({ event: 'pageView' })
 
-  const { iframe } = renderComponent()
+  const { fireLoadEvent } = renderComponent()
 
   expect(sendEventMock.mock.calls).toHaveLength(0)
 
-  fireEvent.load(iframe)
-
+  fireLoadEvent()
   const event = getEventArgument(sendEventMock.mock.calls[0])
 
   expect(event).toMatchObject({
@@ -121,14 +148,14 @@ test('should trigger past first events triggered after subscribing but before on
   const { __pushEvent, usePixel } = require('../PixelContext')
   const { subscribe: subscribeMock } = usePixel()
 
-  const { iframe } = renderComponent()
+  const { fireLoadEvent } = renderComponent()
 
   expect(subscribeMock).toHaveBeenCalledTimes(1)
   expect(sendEventMock).toHaveBeenCalledTimes(0)
 
   __pushEvent({ event: 'pageView' })
 
-  fireEvent.load(iframe)
+  fireLoadEvent()
 
   const event = getEventArgument(sendEventMock.mock.calls[0])
 
@@ -144,13 +171,13 @@ test('should trigger events subscribed and past first events', () => {
 
   __pushEvent({ event: 'pageView' })
 
-  const { iframe } = renderComponent()
+  const { fireLoadEvent } = renderComponent()
 
   __pushEvent({ event: 'pageInfo', data: 'baz' })
 
   expect(sendEventMock).toHaveBeenCalledTimes(0)
 
-  fireEvent.load(iframe)
+  fireLoadEvent()
 
   __pushEvent({ event: 'orderPlaced', data: 'foo' })
 
@@ -164,13 +191,13 @@ test('should trigger events subscribed and past first events', () => {
 
 test('should not trigger duplicate events', () => {
   const { __pushEvent } = require('../PixelContext')
-  const { iframe } = renderComponent()
+  const { fireLoadEvent } = renderComponent()
 
   __pushEvent({ event: 'pageView' })
 
   expect(sendEventMock).toHaveBeenCalledTimes(0)
 
-  fireEvent.load(iframe)
+  fireLoadEvent()
 
   __pushEvent({ event: 'orderPlaced', data: 'foo' })
 

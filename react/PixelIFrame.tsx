@@ -33,6 +33,16 @@ function enhanceFirstEvents(firstEvents: PixelData[], currency: string) {
   return firstEvents.map(e => enhanceEvent(e, currency))
 }
 
+function useMessageEvents(listener: (e: MessageEvent) => void, deps: any[]) {
+  useEffect(() => {
+    window.addEventListener('message', listener, false)
+
+    return () => {
+      window.removeEventListener('message', listener)
+    }
+  }, deps)
+}
+
 const PixelIFrame: React.FunctionComponent<Props> = ({ pixel }) => {
   const frame = useRef<HTMLIFrameElement>(null)
   const [isLoaded, setLoadComplete] = useState(false)
@@ -44,6 +54,19 @@ const PixelIFrame: React.FunctionComponent<Props> = ({ pixel }) => {
     workspace,
   } = useRuntime()
   const { subscribe, getFirstEvents } = usePixel()
+
+  const [appName] = pixel.split('@')
+
+  const listenMessage = (message: MessageEvent) => {
+    const sameFrame = frame.current && frame.current.contentWindow === message.source
+    const samePixel = message.data && message.data.indexOf && message.data.indexOf('pixel:ready:' + pixel) === 0
+
+    if (sameFrame && samePixel) {
+      onLoad()
+    }
+  }
+
+  useMessageEvents(listenMessage, [pixel, frame.current])
 
   const onLoad = () => {
     setLoadComplete(true)
@@ -77,7 +100,7 @@ const PixelIFrame: React.FunctionComponent<Props> = ({ pixel }) => {
         return
       }
 
-      if (frame.current === null || frame.current.contentWindow === null) {
+      if (frame.current == null || frame.current.contentWindow === null) {
         return
       }
 
