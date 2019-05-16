@@ -7,6 +7,20 @@ interface Props {
   pixel: string
 }
 
+// internal: the apps bellow need special
+// access and are trusted.
+const WHITELIST = [
+  'vtex.request-capture',
+  'gocommerce.google-analytics',
+  'vtex.google-analytics',
+]
+
+const ACCOUNT_WHITELIST = ['boticario']
+
+const isWhitelisted = (app: string, accountName: string): boolean => {
+  return WHITELIST.includes(app) || ACCOUNT_WHITELIST.includes(accountName)
+}
+
 function enhanceEvent(event: PixelData, currency: string) {
   return {
     currency,
@@ -94,7 +108,10 @@ const PixelIFrame: React.FunctionComponent<Props> = ({ pixel }) => {
     <iframe
       title={pixel}
       hidden
-      onLoad={onLoad}
+      {...(isWhitelisted(appName, account)
+        ? { sandbox: 'allow-scripts allow-same-origin' }
+        : {}
+      )}
       src={`https://${workspace}--${account}.myvtex.com/_v/public/tracking-frame/${pixel}`}
       ref={frame}
     />
