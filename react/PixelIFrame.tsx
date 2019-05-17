@@ -1,4 +1,4 @@
-import React, { memo, useRef, useEffect, useState } from 'react'
+import React, { memo, useRef, useEffect, useState, useCallback } from 'react'
 import { useRuntime } from 'vtex.render-runtime'
 import { PixelData, usePixel } from './PixelContext'
 import sendEvent from './modules/sendEvent'
@@ -33,14 +33,14 @@ function enhanceFirstEvents(firstEvents: PixelData[], currency: string) {
   return firstEvents.map(e => enhanceEvent(e, currency))
 }
 
-function useMessageEvents(listener: (e: MessageEvent) => void, deps: any[]) {
+function useMessageEvents(listener: (e: MessageEvent) => void) {
   useEffect(() => {
     window.addEventListener('message', listener, false)
 
     return () => {
       window.removeEventListener('message', listener)
     }
-  }, deps)
+  }, [listener])
 }
 
 const PixelIFrame: React.FunctionComponent<Props> = ({ pixel }) => {
@@ -57,16 +57,16 @@ const PixelIFrame: React.FunctionComponent<Props> = ({ pixel }) => {
 
   const [appName] = pixel.split('@')
 
-  const listenMessage = (message: MessageEvent) => {
+  const listenMessage = useCallback((message: MessageEvent) => {
     const sameFrame = frame.current && frame.current.contentWindow === message.source
     const samePixel = message.data && message.data.indexOf && message.data.indexOf('pixel:ready:' + pixel) === 0
 
     if (sameFrame && samePixel) {
       onLoad()
     }
-  }
+  }, [pixel])
 
-  useMessageEvents(listenMessage, [pixel, frame.current])
+  useMessageEvents(listenMessage)
 
   const onLoad = () => {
     setLoadComplete(true)
