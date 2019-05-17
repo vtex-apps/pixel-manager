@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.12.0] - 2019-05-17
+
+### Added
+
+- Added new type of event, productImpression.
+
 ## [0.11.3] - 2019-05-14
 
 ### Fixed
@@ -24,6 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.11.1] - 2019-05-09
 
 ### Fixed
+
 - Export `usePixel` in `PixelContext`.
 
 ## [0.11.0] - 2019-05-09
