@@ -57,18 +57,7 @@ const PixelIFrame: React.FunctionComponent<Props> = ({ pixel }) => {
 
   const [appName] = pixel.split('@')
 
-  const listenMessage = useCallback((message: MessageEvent) => {
-    const sameFrame = frame.current && frame.current.contentWindow === message.source
-    const samePixel = message.data && message.data.indexOf && message.data.indexOf('pixel:ready:' + pixel) === 0
-
-    if (sameFrame && samePixel) {
-      onLoad()
-    }
-  }, [pixel])
-
-  useMessageEvents(listenMessage)
-
-  const onLoad = () => {
+  const onLoad = useCallback(() => {
     setLoadComplete(true)
 
     // If the effect already ran, we use ref, otherwise we use `getFirstEvents`
@@ -81,7 +70,25 @@ const PixelIFrame: React.FunctionComponent<Props> = ({ pixel }) => {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       sendEvent(frame.current!.contentWindow!, event)
     })
-  }
+  }, [currency, getFirstEvents, setLoadComplete])
+
+  const listenMessage = useCallback(
+    (message: MessageEvent) => {
+      const sameFrame =
+        frame.current && frame.current.contentWindow === message.source
+      const samePixel =
+        message.data &&
+        message.data.indexOf &&
+        message.data.indexOf('pixel:ready:' + pixel) === 0
+
+      if (sameFrame && samePixel) {
+        onLoad()
+      }
+    },
+    [pixel, onLoad]
+  )
+
+  useMessageEvents(listenMessage)
 
   useEffect(() => {
     const pixelEventHandler = (event: PixelData) => {
@@ -133,8 +140,7 @@ const PixelIFrame: React.FunctionComponent<Props> = ({ pixel }) => {
       hidden
       {...(isWhitelisted(appName, account)
         ? { sandbox: 'allow-scripts allow-same-origin' }
-        : {}
-      )}
+        : {})}
       src={`https://${workspace}--${account}.myvtex.com/_v/public/tracking-frame/${pixel}`}
       ref={frame}
     />
