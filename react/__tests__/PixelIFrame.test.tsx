@@ -57,8 +57,20 @@ function getWindowFromNode(node: any) {
   }
 }
 
+const pixelName = 'vtex.pixel-name'
+
+const fireFastLoadEvent = () => {
+  const _window = getWindowFromNode(window)
+  const message = new _window.MessageEvent('message', {
+    data: 'pixel:ready:' + pixelName,
+    origin: `https://master--storecomponents.myvtex.com/_v/public/tracking-frame/${pixelName}`,
+  })
+  act(() => {
+    _window.dispatchEvent(message)
+  })
+}
+
 const renderComponent = () => {
-  const pixelName = 'vtex.pixel-name'
   const helpers = render(<PixelIFrame pixel={pixelName} />)
 
   const fireLoadEvent = (data?: string) => {
@@ -75,7 +87,7 @@ const renderComponent = () => {
     })
   }
 
-  return { ...helpers, pixelName, fireLoadEvent }
+  return { ...helpers, fireLoadEvent }
 }
 
 beforeEach(() => {
@@ -113,7 +125,7 @@ test('should subscribe', () => {
   )
 })
 
-test('should unsubscribe', async () => {
+test('should unsubscribe', () => {
   const { usePixel } = require('../PixelContext')
   const { subscribe: subscribeMock } = usePixel()
 
@@ -128,16 +140,24 @@ test('should unsubscribe', async () => {
   expect(unsubscribeMock).toHaveBeenCalledTimes(1)
 })
 
-test('should trigger past first events triggered before rendering on load', async () => {
+test('should trigger pixe:listening event', () => {
+  renderComponent()
+
+  expect(sendEventMock.mock.calls).toHaveLength(1)
+  expect(getEventArgument(sendEventMock.mock.calls[0]).event).toBe('pixel:listening')
+})
+
+test('should trigger past first events triggered before rendering on load', () => {
   const { __pushEvent } = require('../PixelContext')
   __pushEvent({ event: 'pageView' })
 
   const { fireLoadEvent } = renderComponent()
 
-  expect(sendEventMock.mock.calls).toHaveLength(0)
+  expect(sendEventMock.mock.calls).toHaveLength(1)
 
   fireLoadEvent()
-  const event = getEventArgument(sendEventMock.mock.calls[0])
+
+  const event = getEventArgument(sendEventMock.mock.calls[1])
 
   expect(event).toMatchObject({
     currency: 'BRL',
@@ -153,13 +173,13 @@ test('should trigger past first events triggered after subscribing but before on
   const { fireLoadEvent } = renderComponent()
 
   expect(subscribeMock).toHaveBeenCalledTimes(1)
-  expect(sendEventMock).toHaveBeenCalledTimes(0)
+  expect(sendEventMock).toHaveBeenCalledTimes(1)
 
   __pushEvent({ event: 'pageView' })
 
   fireLoadEvent()
 
-  const event = getEventArgument(sendEventMock.mock.calls[0])
+  const event = getEventArgument(sendEventMock.mock.calls[1])
 
   expect(event).toMatchObject({
     currency: 'BRL',
@@ -177,16 +197,16 @@ test('should trigger events subscribed and past first events', () => {
 
   __pushEvent({ event: 'pageInfo', data: 'baz' })
 
-  expect(sendEventMock).toHaveBeenCalledTimes(0)
+  expect(sendEventMock).toHaveBeenCalledTimes(1)
 
   fireLoadEvent()
 
   __pushEvent({ event: 'orderPlaced', data: 'foo' })
 
-  expect(sendEventMock).toHaveBeenCalledTimes(3)
-  expect(getEventArgument(sendEventMock.mock.calls[0]).event).toBe('pageView')
-  expect(getEventArgument(sendEventMock.mock.calls[1]).event).toBe('pageInfo')
-  expect(getEventArgument(sendEventMock.mock.calls[2]).event).toBe(
+  expect(sendEventMock).toHaveBeenCalledTimes(4)
+  expect(getEventArgument(sendEventMock.mock.calls[1]).event).toBe('pageView')
+  expect(getEventArgument(sendEventMock.mock.calls[2]).event).toBe('pageInfo')
+  expect(getEventArgument(sendEventMock.mock.calls[3]).event).toBe(
     'orderPlaced'
   )
 })
@@ -197,15 +217,35 @@ test('should not trigger duplicate events', () => {
 
   __pushEvent({ event: 'pageView' })
 
-  expect(sendEventMock).toHaveBeenCalledTimes(0)
+  expect(sendEventMock).toHaveBeenCalledTimes(1)
 
   fireLoadEvent()
 
   __pushEvent({ event: 'orderPlaced', data: 'foo' })
 
-  expect(sendEventMock).toHaveBeenCalledTimes(2)
-  expect(getEventArgument(sendEventMock.mock.calls[0]).event).toBe('pageView')
-  expect(getEventArgument(sendEventMock.mock.calls[1]).event).toBe(
+  expect(sendEventMock).toHaveBeenCalledTimes(3)
+  expect(getEventArgument(sendEventMock.mock.calls[1]).event).toBe('pageView')
+  expect(getEventArgument(sendEventMock.mock.calls[2]).event).toBe(
     'orderPlaced'
   )
+})
+
+test('should handle when load event is triggered before PixelIFrame listen to iframe events', () => {
+  const { __pushEvent, usePixel } = require('../PixelContext')
+  const { subscribe: subscribeMock } = usePixel()
+
+  fireFastLoadEvent()
+
+  const { fireLoadEvent } = renderComponent()
+
+  expect(subscribeMock).toHaveBeenCalledTimes(1)
+  expect(sendEventMock).toHaveBeenCalledTimes(1)
+
+  __pushEvent({ event: 'pageView' })
+
+  fireLoadEvent()
+
+  expect(sendEventMock).toHaveBeenCalledTimes(2)
+
+  expect(getEventArgument(sendEventMock.mock.calls[1]).event).toBe('pageView')
 })
