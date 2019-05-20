@@ -42,18 +42,22 @@ function enhanceFirstEvents(firstEvents: PixelData[], currency: string) {
 
 function useMessageEvents(
   listener: (e: MessageEvent) => void,
+  pixel: string,
   frame: RefObject<HTMLIFrameElement>
 ) {
   useEffect(() => {
     window.addEventListener('message', listener, false)
     if (frame.current && frame.current.contentWindow) {
-      sendEvent(frame.current.contentWindow, { event: 'pixel:listening' })
+      sendEvent(frame.current.contentWindow, {
+        event: 'pixel:listening',
+        pixel,
+      })
     }
 
     return () => {
       window.removeEventListener('message', listener)
     }
-  }, [listener])
+  }, [listener, pixel])
 }
 
 const PixelIFrame: React.FunctionComponent<Props> = ({ pixel }) => {
@@ -101,7 +105,7 @@ const PixelIFrame: React.FunctionComponent<Props> = ({ pixel }) => {
     [pixel, onLoad]
   )
 
-  useMessageEvents(listenMessage, frame)
+  useMessageEvents(listenMessage, pixel, frame)
 
   useEffect(() => {
     const pixelEventHandler = (event: PixelData) => {

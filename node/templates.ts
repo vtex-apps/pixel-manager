@@ -25,8 +25,12 @@ export const html = ({ appId, settings = {}, scripts = [] }: TemplateInput) => `
     function triggerReady() {
       window.parent.postMessage('pixel:ready:${appId}', '*');
     }
-    function listener(event) {
-      if (event.data === 'pixel:listening') {
+    function listener(message) {
+      if (
+        message.data &&
+        message.data.event === 'pixel:listening' &&
+        message.data.pixel === '${appId}'
+      ) {
         triggerReady();
         window.removeEventListener('message', listener);
       }
