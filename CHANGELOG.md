@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.12.1-beta] - 2019-05-20
+
 ### Fixed
 
 - Usage of cookies by iframes.
