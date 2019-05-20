@@ -151,10 +151,11 @@ const PixelIFrame: React.FunctionComponent<Props> = ({ pixel }) => {
     <iframe
       title={pixel}
       hidden
-      {...(isWhitelisted(appName, account)
-        ? { sandbox: 'allow-scripts allow-same-origin' }
-        : {})}
-      src={`https://${workspace}--${account}.myvtex.com/_v/public/tracking-frame/${pixel}`}
+      src={
+        isWhitelisted(appName, account)
+          ? `/_v/public/tracking-frame/${pixel}`
+          : `https://${workspace}--${account}.myvtex.com/_v/public/tracking-frame/${pixel}`
+      }
       ref={frame}
     />
   )
