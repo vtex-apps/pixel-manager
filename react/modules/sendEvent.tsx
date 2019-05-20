@@ -5,7 +5,10 @@ interface PixelCommunication {
   pixel: string
 }
 
-const sendEvent = (frameWindow: Window, data: PixelData | PixelCommunication) => {
+const sendEvent = (
+  frameWindow: Window,
+  data: PixelData | PixelCommunication
+) => {
   frameWindow.postMessage(data, '*')
 }
 

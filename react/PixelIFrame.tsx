@@ -1,10 +1,4 @@
-import React, {
-  memo,
-  useRef,
-  useEffect,
-  useState,
-  useCallback,
-} from 'react'
+import React, { memo, useRef, useEffect, useState, useCallback } from 'react'
 import { useRuntime } from 'vtex.render-runtime'
 import { PixelData, usePixel } from './PixelContext'
 import sendEvent from './modules/sendEvent'
@@ -64,6 +58,10 @@ const PixelIFrame: React.FunctionComponent<Props> = ({ pixel }) => {
   const [appName] = pixel.split('@')
 
   const onLoad = useCallback(() => {
+    if (isLoaded) {
+      return
+    }
+
     setLoadComplete(true)
 
     // If the effect already ran, we use ref, otherwise we use `getFirstEvents`
@@ -76,7 +74,7 @@ const PixelIFrame: React.FunctionComponent<Props> = ({ pixel }) => {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       sendEvent(frame.current!.contentWindow!, event)
     })
-  }, [currency, getFirstEvents, setLoadComplete])
+  }, [currency, getFirstEvents, setLoadComplete, isLoaded])
 
   const listenMessage = useCallback(
     (message: MessageEvent) => {

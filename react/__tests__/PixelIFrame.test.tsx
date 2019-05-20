@@ -144,7 +144,9 @@ test('should trigger pixe:listening event', () => {
   renderComponent()
 
   expect(sendEventMock.mock.calls).toHaveLength(1)
-  expect(getEventArgument(sendEventMock.mock.calls[0]).event).toBe('pixel:listening')
+  expect(getEventArgument(sendEventMock.mock.calls[0]).event).toBe(
+    'pixel:listening'
+  )
 })
 
 test('should trigger past first events triggered before rendering on load', () => {
@@ -219,9 +221,10 @@ test('should not trigger duplicate events', () => {
 
   expect(sendEventMock).toHaveBeenCalledTimes(1)
 
-  fireLoadEvent()
-
   __pushEvent({ event: 'orderPlaced', data: 'foo' })
+
+  fireLoadEvent()
+  fireLoadEvent()
 
   expect(sendEventMock).toHaveBeenCalledTimes(3)
   expect(getEventArgument(sendEventMock.mock.calls[1]).event).toBe('pageView')
