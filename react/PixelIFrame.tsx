@@ -4,7 +4,6 @@ import React, {
   useEffect,
   useState,
   useCallback,
-  RefObject,
 } from 'react'
 import { useRuntime } from 'vtex.render-runtime'
 import { PixelData, usePixel } from './PixelContext'
@@ -40,24 +39,14 @@ function enhanceFirstEvents(firstEvents: PixelData[], currency: string) {
   return firstEvents.map(e => enhanceEvent(e, currency))
 }
 
-function useMessageEvents(
-  listener: (e: MessageEvent) => void,
-  pixel: string,
-  frame: RefObject<HTMLIFrameElement>
-) {
+function useMessageEvents(listener: (e: MessageEvent) => void) {
   useEffect(() => {
     window.addEventListener('message', listener, false)
-    if (frame.current && frame.current.contentWindow) {
-      sendEvent(frame.current.contentWindow, {
-        event: 'pixel:listening',
-        pixel,
-      })
-    }
 
     return () => {
       window.removeEventListener('message', listener)
     }
-  }, [listener, pixel])
+  }, [listener])
 }
 
 const PixelIFrame: React.FunctionComponent<Props> = ({ pixel }) => {
@@ -105,7 +94,16 @@ const PixelIFrame: React.FunctionComponent<Props> = ({ pixel }) => {
     [pixel, onLoad]
   )
 
-  useMessageEvents(listenMessage, pixel, frame)
+  useMessageEvents(listenMessage)
+
+  useEffect(() => {
+    if (frame.current && frame.current.contentWindow) {
+      sendEvent(frame.current.contentWindow, {
+        event: 'pixel:listening',
+        pixel,
+      })
+    }
+  }, [frame, pixel])
 
   useEffect(() => {
     const pixelEventHandler = (event: PixelData) => {
