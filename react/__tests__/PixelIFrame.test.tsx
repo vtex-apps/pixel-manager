@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 import React from 'react'
-import { render, fireEvent, wait, act } from '@vtex/test-tools/react'
+import { render, act } from '@vtex/test-tools/react'
 
 import PixelIFrame from '../PixelIFrame'
 import sendEvent from '../modules/sendEvent'
@@ -52,7 +52,7 @@ function getWindowFromNode(node: any) {
   } else {
     // no idea...
     throw new Error(
-      `Unable to find the "window" object for the given node. fireEvent currently supports firing events on DOM nodes, document, and window. Please file an issue with the code that's causing you to see this error: https://github.com/testing-library/dom-testing-library/issues/new`,
+      `Unable to find the "window" object for the given node. fireEvent currently supports firing events on DOM nodes, document, and window. Please file an issue with the code that's causing you to see this error: https://github.com/testing-library/dom-testing-library/issues/new`
     )
   }
 }
@@ -68,9 +68,11 @@ const renderComponent = () => {
     const message = new window.MessageEvent('message', {
       data: data ? data : 'pixel:ready:' + pixelName,
       origin: `https://master--storecomponents.myvtex.com/_v/public/tracking-frame/${pixelName}`,
-      source: iframe.contentWindow
+      source: iframe.contentWindow,
     })
-    act(() => { window.dispatchEvent(message) })
+    act(() => {
+      window.dispatchEvent(message)
+    })
   }
 
   return { ...helpers, pixelName, fireLoadEvent }
