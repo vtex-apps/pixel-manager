@@ -28,7 +28,8 @@ const pixelFrame = async (ctx: ServiceContext, next: () => Promise<any>) => {
   if (!isLinked) {
     ctx.set('Cache-Control', `public, max-age=${CACHE_2_MINUTES}`)
   }
-  ctx.body = html({ scripts, settings })
+
+  ctx.body = html({ appId, scripts, settings })
 
   await next()
 }

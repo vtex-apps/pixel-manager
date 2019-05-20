@@ -4,6 +4,7 @@ declare module 'vtex.render-runtime' {
 
   export interface RuntimeContext {
     account: string
+    workspace: string
     page: string
     culture: {
       availableLocales: string[]

@@ -1,6 +1,14 @@
 import { PixelData } from '../PixelContext'
 
-const sendEvent = (frameWindow: Window, data: PixelData) => {
+interface PixelCommunication {
+  event: 'pixel:listening'
+  pixel: string
+}
+
+const sendEvent = (
+  frameWindow: Window,
+  data: PixelData | PixelCommunication
+) => {
   frameWindow.postMessage(data, '*')
 }
 

@@ -1,4 +1,4 @@
-import React, { memo, useRef, useEffect, useState } from 'react'
+import React, { memo, useRef, useEffect, useState, useCallback } from 'react'
 import { useRuntime } from 'vtex.render-runtime'
 import { PixelData, usePixel } from './PixelContext'
 import sendEvent from './modules/sendEvent'
@@ -33,6 +33,16 @@ function enhanceFirstEvents(firstEvents: PixelData[], currency: string) {
   return firstEvents.map(e => enhanceEvent(e, currency))
 }
 
+function useMessageEvents(listener: (e: MessageEvent) => void) {
+  useEffect(() => {
+    window.addEventListener('message', listener, false)
+
+    return () => {
+      window.removeEventListener('message', listener)
+    }
+  }, [listener])
+}
+
 const PixelIFrame: React.FunctionComponent<Props> = ({ pixel }) => {
   const frame = useRef<HTMLIFrameElement>(null)
   const [isLoaded, setLoadComplete] = useState(false)
@@ -41,10 +51,17 @@ const PixelIFrame: React.FunctionComponent<Props> = ({ pixel }) => {
   const {
     culture: { currency },
     account,
+    workspace,
   } = useRuntime()
   const { subscribe, getFirstEvents } = usePixel()
 
-  const onLoad = () => {
+  const [appName] = pixel.split('@')
+
+  const onLoad = useCallback(() => {
+    if (isLoaded) {
+      return
+    }
+
     setLoadComplete(true)
 
     // If the effect already ran, we use ref, otherwise we use `getFirstEvents`
@@ -57,7 +74,34 @@ const PixelIFrame: React.FunctionComponent<Props> = ({ pixel }) => {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       sendEvent(frame.current!.contentWindow!, event)
     })
-  }
+  }, [currency, getFirstEvents, setLoadComplete, isLoaded])
+
+  const listenMessage = useCallback(
+    (message: MessageEvent) => {
+      const sameFrame =
+        frame.current && frame.current.contentWindow === message.source
+      const samePixel =
+        message.data &&
+        message.data.indexOf &&
+        message.data.indexOf('pixel:ready:' + pixel) === 0
+
+      if (sameFrame && samePixel) {
+        onLoad()
+      }
+    },
+    [pixel, onLoad]
+  )
+
+  useMessageEvents(listenMessage)
+
+  useEffect(() => {
+    if (frame.current && frame.current.contentWindow) {
+      sendEvent(frame.current.contentWindow, {
+        event: 'pixel:listening',
+        pixel,
+      })
+    }
+  }, [frame, pixel])
 
   useEffect(() => {
     const pixelEventHandler = (event: PixelData) => {
@@ -76,7 +120,7 @@ const PixelIFrame: React.FunctionComponent<Props> = ({ pixel }) => {
         return
       }
 
-      if (frame.current === null || frame.current.contentWindow === null) {
+      if (frame.current == null || frame.current.contentWindow === null) {
         return
       }
 
@@ -103,15 +147,15 @@ const PixelIFrame: React.FunctionComponent<Props> = ({ pixel }) => {
     return () => unsubscribe()
   }, [currency, pixel, subscribe, isLoaded, getFirstEvents])
 
-  const [appName] = pixel.split('@')
-
   return (
     <iframe
       title={pixel}
       hidden
-      onLoad={onLoad}
-      sandbox={isWhitelisted(appName, account) ? undefined : 'allow-scripts'}
-      src={`/_v/public/tracking-frame/${pixel}`}
+      src={
+        isWhitelisted(appName, account)
+          ? `/_v/public/tracking-frame/${pixel}`
+          : `https://${workspace}--${account}.myvtex.com/_v/public/tracking-frame/${pixel}`
+      }
       ref={frame}
     />
   )
