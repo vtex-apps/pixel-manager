@@ -1,0 +1,14 @@
+[
+  {
+    "name": "pixel",
+    "description": "Allows access to Pixel",
+    "statements": [
+      {
+        "actions": ["put"],
+        "effect": "allow",
+        "resource":
+          "vrn:vtex.pixel-manager:{{region}}:{{account}}:{{workspace}}:/*"
+      }
+    ]
+  }
+]
