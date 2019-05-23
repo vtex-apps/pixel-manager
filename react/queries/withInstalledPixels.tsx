@@ -7,6 +7,8 @@ interface Data {
 
 export type PixelsDataProps = DataProps<Data, {}>
 
-const withInstalledPixels = graphql<{}, Data>(installedPixelsQuery, {options: {ssr: false}})
+const withInstalledPixels = graphql<{}, Data>(installedPixelsQuery, {
+  options: { ssr: false },
+})
 
 export default withInstalledPixels

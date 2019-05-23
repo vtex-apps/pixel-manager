@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "test": "vtex-test-tools test",
-    "lint": "tsc --noEmit --pretty && eslint --ext ts,tsx ."
+    "lint": "tsc --noEmit --pretty && eslint --fix --ext ts,tsx ."
   },
   "dependencies": {
     "apollo-client": "^2.4.7",
