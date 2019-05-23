@@ -8,6 +8,7 @@ declare module 'vtex.sandbox' {
     allowCookies?: boolean
     allowStyles?: boolean
     iframeRef?: RefObject<HTMLIFrameElement>
+    hidden?: boolean
   }
 
   export const Sandbox: ComponentType<SandboxProps>

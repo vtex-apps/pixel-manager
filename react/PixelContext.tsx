@@ -1,5 +1,5 @@
 import hoistNonReactStatics from 'hoist-non-react-statics'
-import React, { Component, useContext, createContext, createRef, Fragment, RefObject } from 'react'
+import React, { useContext, createContext, createRef, Fragment, RefObject, PureComponent } from 'react'
 import { Sandbox } from 'vtex.sandbox'
 
 import sendEvent from './modules/sendEvent'
@@ -86,12 +86,16 @@ export function Pixel<T>(
 export const usePixel = () => useContext(PixelContext)
 
 function onLoadIframe (readyMessage: string) {
-  window.addEventListener('load', function () {
+  function iframeReady() {
     window.parent.postMessage(readyMessage, '*')
-  })
+  }
+  window.addEventListener('load', iframeReady)
+  if (document.readyState === 'complete') {
+    iframeReady()
+  }
 }
 
-class PixelProvider extends Component<Props, State> {
+class PixelProvider extends PureComponent<Props, State> {
   private pixelContextValue: PixelContextType
   private events = new LocalStorageArray<PixelData>('vtex-pixel-offline-events')
   private ready: boolean = false
@@ -139,29 +143,32 @@ class PixelProvider extends Component<Props, State> {
   }
 
   public render() {
-    let sandbox = null
-    // Pixels are loaded, enter Sandbox
-    if (this.state.pixels) {
-      const sandboxContent = [
-        // Add settings
-        `<script>window.__SETTINGS__ = ${JSON.stringify(this.state.pixels.settings)};</script>`,
-        // Add pixel scripts
-        this.state.pixels.scripts.map((s: string) => `<script src="${s}"></script>`),
-        // Add load function to send ready message
-        `${onLoadIframe.toString()};onLoadIframe(${IFRAME_READY_MESSAGE});`,
-      ].join('')
-
-      sandbox = <Sandbox iframeRef={this.iframeRef} allowStyles={false} allowCookies={true} content={sandboxContent} />
-    }
-
     return (
       <PixelContext.Provider value={this.pixelContextValue}>
         <Fragment>
-          {sandbox}
+          {this.sandbox}
           {this.props.children}
         </Fragment>
       </PixelContext.Provider>
     )
+  }
+
+  private get sandbox () {
+    if (!this.state.pixels) {
+      return null
+    }
+
+    // Pixels are loaded, enter Sandbox
+    const sandboxContent = [
+      // Add settings
+      `<script>window.__SETTINGS__ = ${JSON.stringify(this.state.pixels.settings)};</script>`,
+      // Add pixel scripts
+      this.state.pixels.scripts.map((s: string) => `<script src="${location.href}${s.replace('/', '')}"></script>`),
+      // Add load function to send ready message
+      `${onLoadIframe.toString()};onLoadIframe("${IFRAME_READY_MESSAGE}");</script>`,
+    ].join('')
+
+    return <Sandbox iframeRef={this.iframeRef} hidden allowStyles={false} allowCookies={true} content={sandboxContent} />
   }
 
   private get offline () {
