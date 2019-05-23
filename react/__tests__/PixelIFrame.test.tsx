@@ -2,7 +2,7 @@
 import React from 'react'
 import { render, act } from '@vtex/test-tools/react'
 
-import PixelIFrame from '../PixelIFrame'
+import PixelManager from '../PixelManager'
 import sendEvent from '../modules/sendEvent'
 
 const sendEventMock = sendEvent as jest.Mock
@@ -71,7 +71,7 @@ const fireFastLoadEvent = () => {
 }
 
 const renderComponent = () => {
-  const helpers = render(<PixelIFrame pixel={pixelName} />)
+  const helpers = render(<PixelManager pixel={pixelName} />)
 
   const fireLoadEvent = (data?: string) => {
     const iframe = helpers.getByTitle(pixelName) as HTMLIFrameElement

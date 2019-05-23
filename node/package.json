@@ -6,19 +6,16 @@
     "ramda": "^0.26.1"
   },
   "devDependencies": {
-    "@vtex/api": "^3.9.2",
-    "@types/bluebird": "^3.5.25",
-    "@types/bluebird-global": "^3.5.9",
     "@types/koa": "^2.0.39",
     "@types/node": "^11.11.3",
     "@types/ramda": "types/npm-ramda#dist",
-    "eslint": "^5.15.2",
-    "eslint-config-vtex": "^10.0.1",
-    "prettier": "^1.16.4",
-    "typescript": "^3.3.3333"
+    "@vtex/api": "3.16.0",
+    "tslint": "^5.12.0",
+    "tslint-config-vtex": "^2.1.0",
+    "typescript": "^3.4.2"
   },
   "scripts": {
-    "lint": "tsc --noEmit --pretty && eslint --ext ts,tsx ."
+    "lint": "tsc --noEmit && tslint --fix -c tslint.json './**/*.ts'"
   },
   "license": "UNLICENSED"
 }

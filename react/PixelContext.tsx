@@ -1,5 +1,9 @@
 import hoistNonReactStatics from 'hoist-non-react-statics'
-import React, { Component, useContext, createContext } from 'react'
+import React, { Component, useContext, createContext, createRef, Fragment, RefObject } from 'react'
+import { Sandbox } from 'vtex.sandbox'
+
+import sendEvent from './modules/sendEvent'
+import LocalStorageArray from './modules/LocalStorageArray'
 
 type EventType =
   | 'homeView'
@@ -22,29 +26,39 @@ export interface PixelData {
   [data: string]: any
 }
 
-type PixelEventHandler = (data: PixelData) => void
-
-type Subscriber = { [E in EventType]?: PixelEventHandler }
-
 export interface PixelContextType {
-  subscribe: (s: Subscriber) => () => void
   push: (data: PixelData) => void
-  getFirstEvents: () => PixelData[]
 }
+
+declare var process: {
+  env: {
+    NODE_ENV: 'production' | 'development'
+    VTEX_APP_ID: string
+  }
+}
+
+interface PixelResponse {
+  scripts: string[]
+  settings: Record<string, string>
+}
+
+interface Props {
+  currency: string
+}
+
+interface State {
+  pixels?: PixelResponse
+}
+
+const IFRAME_READY_MESSAGE = `${process.env.VTEX_APP_ID}:pixel:ready`
+const PIXELS_URL = `/_v/public/pixel-manager/pixels`
 
 const PixelContext = createContext<PixelContextType>({
   push: () => undefined,
-  subscribe: () => () => undefined,
-  getFirstEvents: () => [],
 })
 
 const getDisplayName = (comp: React.ComponentType<any>) =>
   comp.displayName || comp.name || 'Component'
-
-const getPixelQueue = (): PixelData[] =>
-  localStorage.getItem('pixelQueue')
-    ? JSON.parse(localStorage.getItem('pixelQueue')!) // eslint-disable-line
-    : []
 
 /**
  * Pixel is the HOC Component that provides an event subscription to the
@@ -55,12 +69,10 @@ export function Pixel<T>(
 ) {
   const PixelComponent: React.SFC<T> = props => (
     <PixelContext.Consumer>
-      {({ subscribe, push, getFirstEvents }) => (
+      {({ push }) => (
         <WrappedComponent
           {...props}
           push={push}
-          subscribe={subscribe}
-          getFirstEvents={getFirstEvents}
         />
       )}
     </PixelContext.Consumer>
@@ -71,108 +83,45 @@ export function Pixel<T>(
   return hoistNonReactStatics(PixelComponent, WrappedComponent)
 }
 
-export const usePixel = () => {
-  return useContext(PixelContext)
+export const usePixel = () => useContext(PixelContext)
+
+function onLoadIframe (readyMessage: string) {
+  window.addEventListener('load', function () {
+    window.parent.postMessage(readyMessage, '*')
+  })
 }
 
-interface ProviderState {
-  subscribers: Subscriber[]
-}
-
-declare var process: {
-  env: {
-    NODE_ENV: 'production' | 'development'
-  }
-}
-
-/**
- * HOC Component that has the Pixel logic, dispatching store events
- * to the subscribed external components.
- */
-class PixelProvider extends Component<{}, ProviderState> {
-  public state = {
-    subscribers: [],
-  }
-
+class PixelProvider extends Component<Props, State> {
   private pixelContextValue: PixelContextType
+  private events = new LocalStorageArray<PixelData>('vtex-pixel-offline-events')
+  private ready: boolean = false
+  private iframeRef: RefObject<HTMLIFrameElement>
 
-  private sendingEvents = false
-  private firstEvents: PixelData[] = []
-  private firstEventsTimeout: NodeJS.Timeout | undefined
-  private timeout: boolean = false
-
-  public constructor(props: {}) {
+  public constructor(props: Props) {
     super(props)
 
+    this.state = {}
+    this.iframeRef = createRef<HTMLIFrameElement>()
     this.pixelContextValue = {
       push: this.push,
-      subscribe: this.subscribe,
-      getFirstEvents: this.getFirstEvents,
     }
   }
 
   public componentDidMount() {
-    this.firstEventsTimeout = setTimeout(() => {
-      this.timeout = true
-    }, 7000)
-    window.addEventListener('online', this.sendQueuedEvents)
-    window.addEventListener('message', this.handleWindowMessages)
+    window.addEventListener('online', this.flushEvents)
+    window.addEventListener('message', this.handleWindowMessage)
+    this.fetchPixels()
   }
 
   public componentWillUnmount() {
-    if (this.firstEventsTimeout) {
-      clearTimeout(this.firstEventsTimeout)
-    }
-    window.removeEventListener('online', this.sendQueuedEvents)
-    window.removeEventListener('message', this.handleWindowMessages)
+    window.removeEventListener('online', this.flushEvents)
+    window.removeEventListener('message', this.handleWindowMessage)
   }
 
   /**
-   * Notify all subscribers that have a valid event handler
-   * defined for the corresponding data
-   */
-  public notifySubscribers = (data: PixelData) => {
-    this.state.subscribers.forEach((subscriber: Subscriber) => {
-      if (!data.event) {
-        return
-      }
-
-      const listener = subscriber[data.event]
-
-      if (typeof listener !== 'function') {
-        return
-      }
-
-      listener(data)
-    })
-
-    if (!this.timeout) {
-      this.firstEvents.push(data)
-    }
-  }
-
-  /**
-   * Notify all subscribers of an event data
+   * Push event to iframe
    */
   public push = (data: PixelData) => {
-    const notify = () => {
-      const offline = typeof navigator !== 'undefined' && !navigator.onLine
-      if (offline) {
-        const pixelQueue: PixelData[] = getPixelQueue()
-
-        pixelQueue.push(data)
-
-        try {
-          localStorage.setItem('pixelQueue', JSON.stringify(pixelQueue))
-        } catch (e) {
-          // localStorage might be full
-        }
-      } else {
-        localStorage.removeItem('pixelQueue')
-        this.notifySubscribers(data)
-      }
-    }
-
     // Add all events to window when is linking to ease debugging
     // **Don't make those if's one!**
     if (process.env.NODE_ENV === 'development') {
@@ -182,61 +131,81 @@ class PixelProvider extends Component<{}, ProviderState> {
       }
     }
 
-    notify()
-  }
-
-  /**
-   * Subscribe to all pixel events
-   *
-   * @returns {Function} Unsubscribe function
-   */
-  public subscribe = (subscriber: Subscriber) => {
-    if (subscriber) {
-      this.setState(state => ({
-        subscribers: [subscriber, ...state.subscribers],
-      }))
+    if (this.offline || !this.ready) {
+      this.events.push(data)
+    } else {
+      this.handlePixelEvent(data)
     }
-
-    return () => {
-      this.setState(state => ({
-        subscribers: state.subscribers.filter(sub => sub !== subscriber),
-      }))
-    }
-  }
-
-  public getFirstEvents = () => {
-    return this.firstEvents
   }
 
   public render() {
+    let sandbox = null
+    // Pixels are loaded, enter Sandbox
+    if (this.state.pixels) {
+      const sandboxContent = [
+        // Add settings
+        `<script>window.__SETTINGS__ = ${JSON.stringify(this.state.pixels.settings)};</script>`,
+        // Add pixel scripts
+        this.state.pixels.scripts.map((s: string) => `<script src="${s}"></script>`),
+        // Add load function to send ready message
+        `${onLoadIframe.toString()};onLoadIframe(${IFRAME_READY_MESSAGE});`,
+      ].join('')
+
+      sandbox = <Sandbox iframeRef={this.iframeRef} allowStyles={false} allowCookies={true} content={sandboxContent} />
+    }
+
     return (
       <PixelContext.Provider value={this.pixelContextValue}>
-        {this.props.children}
+        <Fragment>
+          {sandbox}
+          {this.props.children}
+        </Fragment>
       </PixelContext.Provider>
     )
   }
 
-  private sendQueuedEvents = () => {
-    if (this.sendingEvents) {
-      return
-    }
-
-    this.sendingEvents = true
-
-    const pixelQueue: PixelData[] = getPixelQueue()
-
-    pixelQueue.forEach(queuedEvent => this.notifySubscribers(queuedEvent))
-    localStorage.removeItem('pixelQueue')
-
-    this.sendingEvents = false
+  private get offline () {
+    return typeof navigator !== 'undefined' && !navigator.onLine
   }
 
-  private handleWindowMessages = (e: any) => {
+  private flushEvents = () => {
+    this.events.get().forEach(this.handlePixelEvent)
+    this.events.clear()
+  }
+
+  private handleWindowMessage = (e: any) => {
+    if (e.data === IFRAME_READY_MESSAGE) {
+      this.ready = true
+      this.flushEvents()
+    }
+
     if (e.data.pageComponentInteraction) {
       this.push({
         data: e.data,
         event: 'pageComponentInteraction',
       })
+    }
+  }
+
+  private fetchPixels = async () => {
+    window.fetch(PIXELS_URL).then((r) => r.json()).then((pixels: PixelResponse) => {
+      this.setState({pixels})
+    })
+  }
+
+  private enhanceEvent = (event: PixelData, currency: string) => ({
+    currency,
+    eventName: `vtex:${event.event}`,
+    ...event,
+  })
+
+  private handlePixelEvent = (event: PixelData) => {
+    const eventData = this.enhanceEvent(event, this.props.currency)
+
+    if (this.iframeRef.current && this.iframeRef.current.contentWindow) {
+      sendEvent(this.iframeRef.current.contentWindow, eventData)
+    } else {
+      this.events.push(event)
     }
   }
 }

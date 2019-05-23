@@ -5,9 +5,11 @@
   "title": "VTEX Pixel Manager",
   "description": "The VTEX Pixel Manager App.",
   "builders": {
-    "graphql": "1.x",
     "node": "4.x",
     "react": "3.x"
+  },
+  "dependencies": {
+    "vtex.sandbox": "0.x"
   },
   "scripts": {
     "prereleasy": "bash lint.sh",
