@@ -168,8 +168,7 @@ class PixelProvider extends PureComponent<Props, State> {
       )};</script>`,
       // Add pixel scripts
       this.state.pixels.scripts.map(
-        (s: string) =>
-          `<script src="https://${location.host}${s}"></script>`
+        (s: string) => `<script src="https://${location.host}${s}"></script>`
       ),
       // Add load function to send ready message
       `${onLoadIframe.toString()};onLoadIframe("${IFRAME_READY_MESSAGE}");</script>`,
