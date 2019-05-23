@@ -9,7 +9,7 @@
     "react": "3.x"
   },
   "dependencies": {
-    "vtex.sandbox": "0.x"
+    "vtex.sandbox": "0.0.3-beta"
   },
   "scripts": {
     "prereleasy": "bash lint.sh",
