@@ -1,5 +1,12 @@
 import hoistNonReactStatics from 'hoist-non-react-statics'
-import React, { useContext, createContext, createRef, Fragment, RefObject, PureComponent } from 'react'
+import React, {
+  useContext,
+  createContext,
+  createRef,
+  Fragment,
+  RefObject,
+  PureComponent,
+} from 'react'
 import { Sandbox } from 'vtex.sandbox'
 
 import sendEvent from './modules/sendEvent'
@@ -69,12 +76,7 @@ export function Pixel<T>(
 ) {
   const PixelComponent: React.SFC<T> = props => (
     <PixelContext.Consumer>
-      {({ push }) => (
-        <WrappedComponent
-          {...props}
-          push={push}
-        />
-      )}
+      {({ push }) => <WrappedComponent {...props} push={push} />}
     </PixelContext.Consumer>
   )
 
@@ -85,7 +87,7 @@ export function Pixel<T>(
 
 export const usePixel = () => useContext(PixelContext)
 
-function onLoadIframe (readyMessage: string) {
+function onLoadIframe(readyMessage: string) {
   function iframeReady() {
     window.parent.postMessage(readyMessage, '*')
   }
@@ -153,7 +155,7 @@ class PixelProvider extends PureComponent<Props, State> {
     )
   }
 
-  private get sandbox () {
+  private get sandbox() {
     if (!this.state.pixels) {
       return null
     }
@@ -161,17 +163,30 @@ class PixelProvider extends PureComponent<Props, State> {
     // Pixels are loaded, enter Sandbox
     const sandboxContent = [
       // Add settings
-      `<script>window.__SETTINGS__ = ${JSON.stringify(this.state.pixels.settings)};</script>`,
+      `<script>window.__SETTINGS__ = ${JSON.stringify(
+        this.state.pixels.settings
+      )};</script>`,
       // Add pixel scripts
-      this.state.pixels.scripts.map((s: string) => `<script src="${location.href}${s.replace('/', '')}"></script>`),
+      this.state.pixels.scripts.map(
+        (s: string) =>
+          `<script src="${location.href}${s.replace('/', '')}"></script>`
+      ),
       // Add load function to send ready message
       `${onLoadIframe.toString()};onLoadIframe("${IFRAME_READY_MESSAGE}");</script>`,
     ].join('')
 
-    return <Sandbox iframeRef={this.iframeRef} hidden allowStyles={false} allowCookies={true} content={sandboxContent} />
+    return (
+      <Sandbox
+        iframeRef={this.iframeRef}
+        hidden
+        allowStyles={false}
+        allowCookies
+        content={sandboxContent}
+      />
+    )
   }
 
-  private get offline () {
+  private get offline() {
     return typeof navigator !== 'undefined' && !navigator.onLine
   }
 
@@ -195,9 +210,12 @@ class PixelProvider extends PureComponent<Props, State> {
   }
 
   private fetchPixels = async () => {
-    window.fetch(PIXELS_URL).then((r) => r.json()).then((pixels: PixelResponse) => {
-      this.setState({pixels})
-    })
+    window
+      .fetch(PIXELS_URL)
+      .then(r => r.json())
+      .then((pixels: PixelResponse) => {
+        this.setState({ pixels })
+      })
   }
 
   private enhanceEvent = (event: PixelData, currency: string) => ({

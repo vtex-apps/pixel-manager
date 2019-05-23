@@ -1,10 +1,10 @@
 function isLocalStorageSupported() {
   var mod = 'detect'
   try {
-    localStorage.setItem(mod, mod);
-    localStorage.removeItem(mod);
+    localStorage.setItem(mod, mod)
+    localStorage.removeItem(mod)
     return true
-  } catch(e) {
+  } catch (e) {
     return false
   }
 }
@@ -12,8 +12,10 @@ function isLocalStorageSupported() {
 export default class LocalStorageArray<T> {
   private localStorageSupported: boolean
   private fallbackStorage: T[] = []
+  private name: string
 
-  constructor(private name: string) {
+  public constructor(name: string) {
+    this.name = name
     this.localStorageSupported = isLocalStorageSupported()
   }
 
@@ -32,9 +34,7 @@ export default class LocalStorageArray<T> {
   public get() {
     if (this.localStorageSupported) {
       const storage = localStorage.getItem(this.name)
-      return storage
-        ? JSON.parse(storage) as Array<T>
-        : []
+      return storage ? (JSON.parse(storage) as T[]) : []
     }
     return this.fallbackStorage
   }
