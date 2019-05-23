@@ -76,7 +76,6 @@ export default new Service({
 
           // Add scripts
           const basePath = isLinkedPixel ? LINKED_BASE_PATH : PUBLISHED_BASE_PATH
-          scripts.push(`${basePath}/${appIdWithoutBuild}/public/react/runtime${production ? '.min' : ''}.js`)
           scripts.push(`${basePath}/${appIdWithoutBuild}/public/react/index${production ? '.min' : ''}.js`)
         })
       }))
