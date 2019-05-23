@@ -1,7 +1,7 @@
 {
   "vendor": "vtex",
   "name": "pixel-manager",
-  "version": "0.12.1",
+  "version": "0.12.2",
   "title": "VTEX Pixel Manager",
   "description": "The VTEX Pixel Manager App.",
   "builders": {
@@ -20,5 +20,6 @@
     {
       "name": "read-public-registry-assets"
     }
-  ]
+  ],
+  "$schema": "https://raw.githubusercontent.com/vtex/node-vtex-api/master/gen/manifest.schema"
 }
