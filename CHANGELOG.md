@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.12.3] - 2019-05-23
+### Added
+ - Add file policies.json to allow access to Pixel with method PUT.
+
 ## [0.12.2] - 2019-05-23
 
 ## [0.12.1] - 2019-05-20
