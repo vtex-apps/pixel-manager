@@ -5,20 +5,12 @@
   "title": "VTEX Pixel Manager",
   "description": "The VTEX Pixel Manager App.",
   "builders": {
-    "node": "4.x",
-    "react": "3.x"
+    "react": "3.x",
+    "store": "0.x"
   },
   "scripts": {
     "prereleasy": "bash lint.sh",
     "postreleasy": "vtex publish --verbose"
   },
-  "policies": [
-    {
-      "name": "read-workspace-apps"
-    },
-    {
-      "name": "read-public-registry-assets"
-    }
-  ],
   "$schema": "https://raw.githubusercontent.com/vtex/node-vtex-api/master/gen/manifest.schema"
 }
