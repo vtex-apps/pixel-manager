@@ -5,8 +5,7 @@
   "title": "VTEX Pixel Manager",
   "description": "The VTEX Pixel Manager App.",
   "builders": {
-    "react": "3.x",
-    "store": "0.x"
+    "react": "3.x"
   },
   "scripts": {
     "prereleasy": "bash lint.sh",
