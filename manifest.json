@@ -8,9 +8,6 @@
     "node": "4.x",
     "react": "3.x"
   },
-  "dependencies": {
-    "vtex.sandbox": "0.0.3-beta"
-  },
   "scripts": {
     "prereleasy": "bash lint.sh",
     "postreleasy": "vtex publish --verbose"

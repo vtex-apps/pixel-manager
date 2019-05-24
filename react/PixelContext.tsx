@@ -2,14 +2,9 @@ import hoistNonReactStatics from 'hoist-non-react-statics'
 import React, {
   useContext,
   createContext,
-  createRef,
-  Fragment,
-  RefObject,
   PureComponent,
 } from 'react'
-import { Sandbox } from 'vtex.sandbox'
 
-import sendEvent from './modules/sendEvent'
 import LocalStorageArray from './modules/LocalStorageArray'
 
 type EventType =
@@ -44,21 +39,9 @@ declare var process: {
   }
 }
 
-interface PixelResponse {
-  scripts: string[]
-  settings: Record<string, string>
-}
-
 interface Props {
   currency: string
 }
-
-interface State {
-  pixels?: PixelResponse
-}
-
-const IFRAME_READY_MESSAGE = `${process.env.VTEX_APP_ID}:pixel:ready`
-const PIXELS_URL = `/_v/public/pixel-manager/pixels`
 
 const PixelContext = createContext<PixelContextType>({
   push: () => undefined,
@@ -87,27 +70,13 @@ export function Pixel<T>(
 
 export const usePixel = () => useContext(PixelContext)
 
-function onLoadIframe(readyMessage: string) {
-  function iframeReady() {
-    window.parent.postMessage(readyMessage, '*')
-  }
-  window.addEventListener('load', iframeReady)
-  if (document.readyState === 'complete') {
-    iframeReady()
-  }
-}
-
-class PixelProvider extends PureComponent<Props, State> {
+class PixelProvider extends PureComponent<Props> {
   private pixelContextValue: PixelContextType
   private events = new LocalStorageArray<PixelData>('vtex-pixel-offline-events')
-  private ready: boolean = false
-  private iframeRef: RefObject<HTMLIFrameElement>
 
   public constructor(props: Props) {
     super(props)
 
-    this.state = {}
-    this.iframeRef = createRef<HTMLIFrameElement>()
     this.pixelContextValue = {
       push: this.push,
     }
@@ -116,7 +85,6 @@ class PixelProvider extends PureComponent<Props, State> {
   public componentDidMount() {
     window.addEventListener('online', this.flushEvents)
     window.addEventListener('message', this.handleWindowMessage)
-    this.fetchPixels()
   }
 
   public componentWillUnmount() {
@@ -137,7 +105,7 @@ class PixelProvider extends PureComponent<Props, State> {
       }
     }
 
-    if (this.offline || !this.ready) {
+    if (this.offline) {
       this.events.push(data)
     } else {
       this.handlePixelEvent(data)
@@ -147,41 +115,8 @@ class PixelProvider extends PureComponent<Props, State> {
   public render() {
     return (
       <PixelContext.Provider value={this.pixelContextValue}>
-        <Fragment>
-          {this.sandbox}
-          {this.props.children}
-        </Fragment>
+        {this.props.children}
       </PixelContext.Provider>
-    )
-  }
-
-  private get sandbox() {
-    if (!this.state.pixels) {
-      return null
-    }
-
-    // Pixels are loaded, enter Sandbox
-    const sandboxContent = [
-      // Add settings
-      `<script>window.__SETTINGS__ = ${JSON.stringify(
-        this.state.pixels.settings
-      )};</script>`,
-      // Add pixel scripts
-      this.state.pixels.scripts.map(
-        (s: string) => `<script src="https://${location.host}${s}"></script>`
-      ),
-      // Add load function to send ready message
-      `${onLoadIframe.toString()};onLoadIframe("${IFRAME_READY_MESSAGE}");</script>`,
-    ].join('')
-
-    return (
-      <Sandbox
-        iframeRef={this.iframeRef}
-        hidden
-        allowStyles={false}
-        allowCookies
-        content={sandboxContent}
-      />
     )
   }
 
@@ -195,26 +130,12 @@ class PixelProvider extends PureComponent<Props, State> {
   }
 
   private handleWindowMessage = (e: any) => {
-    if (e.data === IFRAME_READY_MESSAGE) {
-      this.ready = true
-      this.flushEvents()
-    }
-
     if (e.data.pageComponentInteraction) {
       this.push({
         data: e.data,
         event: 'pageComponentInteraction',
       })
     }
-  }
-
-  private fetchPixels = async () => {
-    window
-      .fetch(PIXELS_URL)
-      .then(r => r.json())
-      .then((pixels: PixelResponse) => {
-        this.setState({ pixels })
-      })
   }
 
   private enhanceEvent = (event: PixelData, currency: string) => ({
@@ -225,12 +146,7 @@ class PixelProvider extends PureComponent<Props, State> {
 
   private handlePixelEvent = (event: PixelData) => {
     const eventData = this.enhanceEvent(event, this.props.currency)
-
-    if (this.iframeRef.current && this.iframeRef.current.contentWindow) {
-      sendEvent(this.iframeRef.current.contentWindow, eventData)
-    } else {
-      this.events.push(event)
-    }
+    window.postMessage(eventData, window.origin)
   }
 }
 

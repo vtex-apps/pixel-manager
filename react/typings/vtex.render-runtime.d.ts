@@ -1,5 +1,5 @@
 declare module 'vtex.render-runtime' {
-  import React from 'react'
+  import React, { ReactComponentElement } from 'react'
   import { Subtract } from 'utility-types'
 
   export interface RuntimeContext {
@@ -28,4 +28,6 @@ declare module 'vtex.render-runtime' {
   ): React.ComponentType<Subtract<T, RuntimeProps>>
 
   export function useRuntime(): RuntimeContext
+
+  export const NoSSR: ReactComponentElement
 }
