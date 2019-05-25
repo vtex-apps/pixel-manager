@@ -51,10 +51,10 @@ const getDisplayName = (comp: React.ComponentType<any>) =>
   comp.displayName || comp.name || 'Component'
 
 /**
- * Pixel is the HOC Component that provides an event subscription to the
+ * withPixel is the HOC Component that provides an event subscription to the
  * Wrapped Component. This component will be used by the installed apps.
  */
-export function Pixel<T>(
+export function withPixel<T>(
   WrappedComponent: React.ComponentType<T & PixelContextType>
 ) {
   const PixelComponent: React.SFC<T> = props => (
@@ -150,4 +150,4 @@ class PixelProvider extends PureComponent<Props> {
   }
 }
 
-export default { Pixel, PixelProvider, usePixel }
+export default { Pixel: withPixel, withPixel, PixelProvider, usePixel }
