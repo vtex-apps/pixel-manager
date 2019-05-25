@@ -1,9 +1,5 @@
 import hoistNonReactStatics from 'hoist-non-react-statics'
-import React, {
-  useContext,
-  createContext,
-  PureComponent,
-} from 'react'
+import React, { useContext, createContext, PureComponent } from 'react'
 
 import LocalStorageArray from './modules/LocalStorageArray'
 
