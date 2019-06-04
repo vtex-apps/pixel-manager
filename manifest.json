@@ -1,7 +1,7 @@
 {
   "vendor": "vtex",
   "name": "pixel-manager",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "title": "VTEX Pixel Manager",
   "description": "The VTEX Pixel Manager App.",
   "builders": {
