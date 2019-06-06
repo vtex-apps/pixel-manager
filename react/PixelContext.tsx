@@ -1,8 +1,6 @@
 import hoistNonReactStatics from 'hoist-non-react-statics'
 import React, { useContext, createContext, PureComponent } from 'react'
 
-import LocalStorageArray from './modules/LocalStorageArray'
-
 type EventType =
   | 'homeView'
   | 'productView'
@@ -24,6 +22,10 @@ export interface PixelData {
   [data: string]: any
 }
 
+interface PixelEvent extends Event {
+  data: any
+}
+
 export interface PixelContextType {
   push: (data: PixelData) => void
 }
@@ -43,7 +45,7 @@ const PixelContext = createContext<PixelContextType>({
   push: () => undefined,
 })
 
-const getDisplayName = (comp: React.ComponentType<any>) =>
+const getDisplayName = <T extends {}>(comp: React.ComponentType<T>) =>
   comp.displayName || comp.name || 'Component'
 
 /**
@@ -68,7 +70,6 @@ export const usePixel = () => useContext(PixelContext)
 
 class PixelProvider extends PureComponent<Props> {
   private pixelContextValue: PixelContextType
-  private events = new LocalStorageArray<PixelData>('vtex-pixel-offline-events')
 
   public constructor(props: Props) {
     super(props)
@@ -79,12 +80,10 @@ class PixelProvider extends PureComponent<Props> {
   }
 
   public componentDidMount() {
-    window.addEventListener('online', this.flushEvents)
     window.addEventListener('message', this.handleWindowMessage)
   }
 
   public componentWillUnmount() {
-    window.removeEventListener('online', this.flushEvents)
     window.removeEventListener('message', this.handleWindowMessage)
   }
 
@@ -101,11 +100,7 @@ class PixelProvider extends PureComponent<Props> {
       }
     }
 
-    if (this.offline) {
-      this.events.push(data)
-    } else {
-      this.handlePixelEvent(data)
-    }
+    this.handlePixelEvent(data)
   }
 
   public render() {
@@ -116,16 +111,7 @@ class PixelProvider extends PureComponent<Props> {
     )
   }
 
-  private get offline() {
-    return typeof navigator !== 'undefined' && !navigator.onLine
-  }
-
-  private flushEvents = () => {
-    this.events.get().forEach(this.handlePixelEvent)
-    this.events.clear()
-  }
-
-  private handleWindowMessage = (e: any) => {
+  private handleWindowMessage = (e: PixelEvent) => {
     if (e.data.pageComponentInteraction) {
       this.push({
         data: e.data,
