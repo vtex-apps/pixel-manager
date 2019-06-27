@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.2] - 2019-06-27
+
+### Fixed
+- Build assets with new builder hub.
+
 ## [1.1.1] - 2019-06-06
 ### Fixed
 - Temporary fix for an Edge bug, where postMessage would throw a SyntaxError (🤷‍).
