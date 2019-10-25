@@ -48,6 +48,8 @@ const PixelContext = createContext<PixelContextType>({
 const getDisplayName = <T extends {}>(comp: React.ComponentType<T>) =>
   comp.displayName || comp.name || 'Component'
 
+export const usePixel = () => useContext(PixelContext)
+
 /**
  * withPixel is the HOC Component that provides an event subscription to the
  * Wrapped Component. This component will be used by the installed apps.
@@ -55,18 +57,15 @@ const getDisplayName = <T extends {}>(comp: React.ComponentType<T>) =>
 export function withPixel<T>(
   WrappedComponent: React.ComponentType<T & PixelContextType>
 ) {
-  const PixelComponent: React.SFC<T> = props => (
-    <PixelContext.Consumer>
-      {({ push }) => <WrappedComponent {...props} push={push} />}
-    </PixelContext.Consumer>
-  )
+  const PixelComponent: React.FC<T> = props => {
+    const { push } = usePixel()
+    return <WrappedComponent {...props} push={push} />
+  }
 
   PixelComponent.displayName = `withPixel(${getDisplayName(WrappedComponent)})`
 
   return hoistNonReactStatics(PixelComponent, WrappedComponent)
 }
-
-export const usePixel = () => useContext(PixelContext)
 
 class PixelProvider extends PureComponent<Props> {
   private pixelContextValue: PixelContextType
