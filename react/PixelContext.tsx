@@ -16,6 +16,7 @@ type EventType =
   | 'removeFromCart'
   | 'pageComponentInteraction'
   | 'orderPlaced'
+  | 'installWebApp'
 
 export interface PixelData {
   event?: EventType
