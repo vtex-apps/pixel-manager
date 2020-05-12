@@ -8,7 +8,6 @@
     "react": "3.x"
   },
   "scripts": {
-    "prereleasy": "bash lint.sh",
     "postreleasy": "vtex publish --verbose"
   },
   "$schema": "https://raw.githubusercontent.com/vtex/node-vtex-api/master/gen/manifest.schema"
