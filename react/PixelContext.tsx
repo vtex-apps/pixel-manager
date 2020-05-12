@@ -31,7 +31,7 @@ export interface PixelContextType {
   push: (data: PixelData) => void
 }
 
-declare var process: {
+declare let process: {
   env: {
     NODE_ENV: 'production' | 'development'
     VTEX_APP_ID: string
@@ -47,7 +47,7 @@ const PixelContext = createContext<PixelContextType>({
 })
 
 const getDisplayName = <T extends {}>(comp: React.ComponentType<T>) =>
-  comp.displayName || comp.name || 'Component'
+  (comp.displayName ?? comp.name) || 'Component'
 
 export const usePixel = () => useContext(PixelContext)
 
@@ -71,7 +71,7 @@ export function withPixel<T>(
 class PixelProvider extends PureComponent<Props> {
   private pixelContextValue: PixelContextType
 
-  public constructor(props: Props) {
+  constructor(props: Props) {
     super(props)
 
     this.pixelContextValue = {
