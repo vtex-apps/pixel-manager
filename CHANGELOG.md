@@ -6,11 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
 ### Added
+
 - `installWebApp` event.
 
 ## [1.1.4] - 2019-10-25
+
 ### Changed
+
 - Make `withPixel` use usePixel hook to reduce react tree.
 
 ## [1.1.3] - 2019-08-30
@@ -18,24 +22,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.1.2] - 2019-06-27
 
 ### Fixed
+
 - Build assets with new builder hub.
 
 ## [1.1.1] - 2019-06-06
+
 ### Fixed
+
 - Temporary fix for an Edge bug, where postMessage would throw a SyntaxError (🤷‍).
 
 ## [1.1.0] - 2019-06-06
+
 ### Removed
+
 - Offline events handling.
 
 ## [1.0.0] - 2019-05-25
 
 ### Changed
+
 - Rewrite with simpler API using server side snippets
 
 ## [0.12.3] - 2019-05-23
+
 ### Added
- - Add file policies.json to allow access to Pixel with method PUT.
+
+- Add file policies.json to allow access to Pixel with method PUT.
 
 ## [0.12.2] - 2019-05-23
 
