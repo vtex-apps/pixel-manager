@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 
-const useCustomEvent = (
+const usePixelEventCallback = (
   eventId: string | undefined,
   handler: (e: MessageEvent) => void
 ) => {
@@ -31,4 +31,4 @@ const useCustomEvent = (
   }, [eventId, handler])
 }
 
-export default useCustomEvent
+export default usePixelEventCallback
