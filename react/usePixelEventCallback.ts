@@ -28,7 +28,7 @@ const usePixelEventCallback = (
     return () => {
       window.removeEventListener('message', customEventHandler)
     }
-  }, [eventId, handler])
+  }, [eventId, savedHandler])
 }
 
 export default usePixelEventCallback
