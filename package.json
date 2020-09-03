@@ -4,6 +4,7 @@
   "license": "UNLICENSED",
   "scripts": {
     "lint": "eslint --ext js,jsx,ts,tsx .",
+    "test": "cd ./react && yarn test --verbose",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json}\""
   },
   "husky": {
