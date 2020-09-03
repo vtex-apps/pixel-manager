@@ -1,9 +1,16 @@
 import { useEffect, useRef } from 'react'
 
-const usePixelEventCallback = (
-  eventId: string | undefined,
-  handler: (e: MessageEvent) => void
-) => {
+import { PixelData } from './PixelContext'
+
+const usePixelEventCallback = ({
+  eventId,
+  eventName,
+  handler,
+}: {
+  eventId?: string
+  eventName?: PixelData['event']
+  handler: (e?: MessageEvent) => void
+}) => {
   const savedHandler = useRef(handler)
 
   useEffect(() => {
@@ -13,12 +20,15 @@ const usePixelEventCallback = (
   useEffect(() => {
     const isSupported = Boolean(window?.addEventListener)
 
-    if (!isSupported || !eventId) {
+    if (!isSupported || (!eventId && !eventName)) {
       return
     }
 
     const customEventHandler = (e: MessageEvent) => {
-      if (e.data.id === eventId) {
+      if (
+        (e.data as PixelData).id === eventId ||
+        (e.data as PixelData).event === eventName
+      ) {
         savedHandler.current(e)
       }
     }
@@ -28,7 +38,7 @@ const usePixelEventCallback = (
     return () => {
       window.removeEventListener('message', customEventHandler)
     }
-  }, [eventId, savedHandler])
+  }, [eventId, eventName, savedHandler])
 }
 
 export default usePixelEventCallback
