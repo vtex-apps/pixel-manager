@@ -17,6 +17,7 @@ type EventType =
   | 'pageComponentInteraction'
   | 'orderPlaced'
   | 'installWebApp'
+  | 'openDrawer'
 
 export interface PixelData {
   id?: string
@@ -47,7 +48,7 @@ const PixelContext = createContext<PixelContextType>({
   push: () => undefined,
 })
 
-const getDisplayName = <T extends Record<string, unknown>>(
+const getDisplayName = <T extends Record<string, any>>(
   comp: React.ComponentType<T>
 ) => (comp.displayName ?? comp.name) || 'Component'
 
