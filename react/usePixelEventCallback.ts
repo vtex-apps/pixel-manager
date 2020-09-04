@@ -2,6 +2,37 @@ import { useEffect, useRef } from 'react'
 
 import { PixelData } from './PixelContext'
 
+export const shouldCallEventHandler = (
+  pixelEventData: PixelData,
+  eventId: string | undefined,
+  eventName: PixelData['event']
+) => {
+  const receivedEventId = Boolean(eventId)
+  const receivedEventName = Boolean(eventName)
+  const eventHasId = Boolean(pixelEventData.id)
+  const eventHasName = Boolean(pixelEventData.event)
+
+  let result = false
+
+  // These checks are to make sure that handlers are only called when
+  // both the 'eventId' (if received) and the 'eventName' (if received)
+  // match the event being processed.
+  // If any of those arguments were NOT received, only the one that was
+  // received should be taken into account.
+  if (receivedEventId && eventHasId && pixelEventData.id === eventId) {
+    result =
+      !receivedEventName || (eventHasName && pixelEventData.event === eventName)
+  } else if (
+    receivedEventName &&
+    eventHasName &&
+    pixelEventData.event === eventName
+  ) {
+    result = !receivedEventId || (eventHasId && pixelEventData.id === eventId)
+  }
+
+  return result
+}
+
 const usePixelEventCallback = ({
   eventId,
   eventName,
@@ -25,10 +56,9 @@ const usePixelEventCallback = ({
     }
 
     const customEventHandler = (e: MessageEvent) => {
-      if (
-        (e.data as PixelData).id === eventId ||
-        (e.data as PixelData).event === eventName
-      ) {
+      const pixelEventData = e.data as PixelData
+
+      if (shouldCallEventHandler(pixelEventData, eventId, eventName)) {
         savedHandler.current(e)
       }
     }
