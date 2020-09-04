@@ -44,7 +44,7 @@ interface Props {
   currency: string
 }
 
-const PixelContext = createContext<PixelContextType>({
+export const PixelContext = createContext<PixelContextType>({
   push: () => undefined,
 })
 
