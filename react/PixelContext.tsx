@@ -17,10 +17,12 @@ type EventType =
   | 'pageComponentInteraction'
   | 'orderPlaced'
   | 'installWebApp'
+  | 'openDrawer'
 
 export interface PixelData {
+  id?: string
   event?: EventType
-  [data: string]: any
+  [data: string]: unknown
 }
 
 interface PixelEvent extends Event {
@@ -42,12 +44,13 @@ interface Props {
   currency: string
 }
 
-const PixelContext = createContext<PixelContextType>({
+export const PixelContext = createContext<PixelContextType>({
   push: () => undefined,
 })
 
-const getDisplayName = <T extends {}>(comp: React.ComponentType<T>) =>
-  (comp.displayName ?? comp.name) || 'Component'
+const getDisplayName = <T extends Record<string, any>>(
+  comp: React.ComponentType<T>
+) => (comp.displayName ?? comp.name) || 'Component'
 
 export const usePixel = () => useContext(PixelContext)
 
@@ -60,6 +63,7 @@ export function withPixel<T>(
 ) {
   const PixelComponent: React.FC<T> = props => {
     const { push } = usePixel()
+
     return <WrappedComponent {...props} push={push} />
   }
 
@@ -128,6 +132,7 @@ class PixelProvider extends PureComponent<Props> {
 
   private handlePixelEvent = (event: PixelData) => {
     const eventData = this.enhanceEvent(event, this.props.currency)
+
     try {
       window.postMessage(eventData, window.origin)
     } catch (e) {

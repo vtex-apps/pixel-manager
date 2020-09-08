@@ -3,8 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "test": "vtex-test-tools test",
-    "lint": "tsc --noEmit --pretty && eslint --fix --ext ts,tsx ."
+    "test": "vtex-test-tools test"
   },
   "dependencies": {
     "graphql": "^14.0.2",
@@ -18,11 +17,8 @@
     "@types/prop-types": "^15.5.8",
     "@types/ramda": "types/npm-ramda#dist",
     "@types/react": "^16.7.17",
-    "@vtex/test-tools": "^0.3.2",
-    "eslint": "^5.15.2",
-    "eslint-config-vtex-react": "^4.0.0",
+    "@vtex/test-tools": "^3.3.2",
     "graphql-tag": "^2.10.0",
-    "prettier": "^1.16.4",
     "react": "^16.8.1",
     "react-dom": "^16.8.1",
     "typescript": "3.8.3"
