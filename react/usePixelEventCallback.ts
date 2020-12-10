@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 
-import { PixelData } from './PixelContext'
+import { PixelData } from './PixelEventTypes'
 
 export const shouldCallEventHandler = (
   pixelEventData: PixelData,
