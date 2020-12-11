@@ -1,37 +1,7 @@
 import hoistNonReactStatics from 'hoist-non-react-statics'
 import React, { useContext, createContext, PureComponent } from 'react'
 
-type EventType =
-  | 'addToCart'
-  | 'cart'
-  | 'cartChanged'
-  | 'cartId'
-  | 'cartLoaded'
-  | 'categoryView'
-  | 'checkout'
-  | 'checkoutOption'
-  | 'departmentView'
-  | 'finishPayment'
-  | 'homeView'
-  | 'installWebApp'
-  | 'internalSiteSearchView'
-  | 'openDrawer'
-  | 'orderPlaced'
-  | 'otherView'
-  | 'pageComponentInteraction'
-  | 'pageInfo'
-  | 'pageView'
-  | 'productClick'
-  | 'productImpression'
-  | 'productView'
-  | 'removeFromCart'
-  | 'sendPayments'
-
-export interface PixelData {
-  id?: string
-  event?: EventType
-  [data: string]: unknown
-}
+import { PixelData } from './PixelEventTypes'
 
 interface PixelEvent extends Event {
   data: any
@@ -152,4 +122,9 @@ class PixelProvider extends PureComponent<Props> {
   }
 }
 
-export default { Pixel: withPixel, withPixel, PixelProvider, usePixel }
+export default {
+  Pixel: withPixel,
+  withPixel,
+  PixelProvider,
+  usePixel,
+}
