@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 - `promotionClick` and `promoView` pixel events
+
 ## [1.6.0] - 2020-12-11
 ### Added
 - `PixelEventTypes` entrypoint that exports relevant types.
