@@ -21,6 +21,8 @@ export type EventName =
   | 'productClick'
   | 'productImpression'
   | 'productView'
+  | 'promotionClick'
+  | 'promoView'
   | 'removeFromCart'
   | 'sendPayments'
 
