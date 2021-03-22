@@ -1,7 +1,7 @@
 import hoistNonReactStatics from 'hoist-non-react-statics'
 import React, { useContext, createContext, PureComponent } from 'react'
 
-import { PixelData } from './PixelEventTypes'
+import type { PixelData } from './PixelEventTypes'
 
 interface PixelEvent extends Event {
   data: any
@@ -39,7 +39,7 @@ export const usePixel = () => useContext(PixelContext)
 export function withPixel<T>(
   WrappedComponent: React.ComponentType<T & PixelContextType>
 ) {
-  const PixelComponent: React.FC<T> = props => {
+  const PixelComponent: React.FC<T> = (props) => {
     const { push } = usePixel()
 
     return <WrappedComponent {...props} push={push} />

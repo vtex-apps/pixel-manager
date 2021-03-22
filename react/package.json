@@ -18,9 +18,11 @@
     "@types/ramda": "types/npm-ramda#dist",
     "@types/react": "^16.7.17",
     "@vtex/test-tools": "^3.3.2",
+    "@vtex/tsconfig": "^0.4.4",
     "graphql-tag": "^2.10.0",
     "react": "^16.8.1",
     "react-dom": "^16.8.1",
-    "typescript": "3.9.7"
+    "typescript": "3.9.7",
+    "vtex.render-runtime": "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.render-runtime@8.128.2/public/@types/vtex.render-runtime"
   }
 }

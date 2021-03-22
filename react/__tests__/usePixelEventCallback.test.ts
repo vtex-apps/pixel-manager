@@ -1,5 +1,5 @@
 import { shouldCallEventHandler } from '../usePixelEventCallback'
-import { PixelData } from '../PixelContext'
+import type { PixelData } from '../PixelEventTypes'
 
 const mockPixelEventData: PixelData = {
   id: 'test',
