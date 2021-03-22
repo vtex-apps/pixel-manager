@@ -25,6 +25,7 @@ export type EventName =
   | 'promoView'
   | 'removeFromCart'
   | 'sendPayments'
+  | 'newsletterSubscription'
 
 export interface PixelData {
   id?: string
