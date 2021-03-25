@@ -6,10 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- `newsletterSubscription` pixel event.
 
 ## [1.6.1] - 2020-12-16
 ### Added
-- `promotionClick` and `promoView` pixel events
+- `promotionClick` and `promoView` pixel events.
 
 ## [1.6.0] - 2020-12-11
 ### Added
