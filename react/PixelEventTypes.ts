@@ -19,7 +19,7 @@ export type EventName =
   | 'pageInfo'
   | 'pageView'
   | 'productClick'
-  | 'productComparison' 
+  | 'productComparison'
   | 'productImpression'
   | 'productView'
   | 'promotionClick'
