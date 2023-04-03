@@ -35,7 +35,7 @@ export type EventName =
   | 'share'
   | 'login'
   | 'search'
-  | 'signup'
+  | 'signUp'
   | 'refund'
 
 export interface PixelData {
