@@ -27,6 +27,16 @@ export type EventName =
   | 'removeFromCart'
   | 'sendPayments'
   | 'newsletterSubscription'
+  | 'viewCart'
+  | 'beginCheckout'
+  | 'addPaymentInfo'
+  | 'addShippingInfo'
+  | 'addToWishlist'
+  | 'share'
+  | 'login'
+  | 'search'
+  | 'signup'
+  | 'refund'
 
 export interface PixelData {
   id?: string
