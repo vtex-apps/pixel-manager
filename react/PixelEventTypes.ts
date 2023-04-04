@@ -25,6 +25,7 @@ export type EventName =
   | 'promotionClick'
   | 'promoView'
   | 'removeFromCart'
+  | 'removeToWishlist'
   | 'sendPayments'
   | 'newsletterSubscription'
   | 'viewCart'
