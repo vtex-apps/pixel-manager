@@ -1,6 +1,7 @@
 export type EventName =
   | 'addToCart'
   | 'cart'
+  | 'autocomplete'
   | 'cartChanged'
   | 'cartId'
   | 'cartLoaded'
